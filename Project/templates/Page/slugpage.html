@@ -93,19 +93,32 @@
             }
 
         {% endfor %}
+        
+        var pageTitles = [];
 
         {% for i in pageData %}
             
             
             if ('{{i.locale}}' == selected_language_code){
-                console.log("page title :"+'{{i.title}} {{pageData|length}}');
+                pageTitles.push("{{i.title}}");
+                console.log("page title :"+ pageTitles);
                 // for (j = 0; j < {{pageData|length}}; j++){
-                    $('#headerLink nav a').append('<a>{{i.title}}</a>');
+                    
                     $('#footerLink h6 a').html('{{i.title}}');
+                
                 // }
             }
+            $('#headerLink nav').each(function(){
+                for(i=0;i<pageTitles.length;i++){
+                        if($('a').is(':empty')){
+                            $('a').html(pageTitles[i]);
+                            
+                        }
+                    }
+                    });
 
         {% endfor %}
+        
 });
 
 
