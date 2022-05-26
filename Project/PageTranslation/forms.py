@@ -6,7 +6,7 @@ from PageTranslation.models import pageTranslation
 class PageTranslationForm(forms.ModelForm):
     class Meta():
         model = pageTranslation
-        fields = ('page','language','title','content')
+        fields = ('language','title','content')
         widgets = {'language': forms.HiddenInput()}
 
         # widgets = {
