@@ -4,6 +4,13 @@ from Page.models import page
 from Language.models import language
 from PageTranslation.models import pageTranslation
 from PageTranslation.forms import PageTranslationForm
+from django.contrib import messages
+from django.template.defaulttags import register
+...
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
+
 
     
 class PageAdmin(admin.ModelAdmin):
@@ -41,7 +48,7 @@ class PageAdmin(admin.ModelAdmin):
                     translation = pageTranslation(page=pg,title=title,content=content,language=lang)
                     translation.save()
             
-            
+                messages.success(request,slug+" added successfully")
                 return HttpResponseRedirect('/admin/Page/page/')
 
             else:
@@ -52,10 +59,20 @@ class PageAdmin(admin.ModelAdmin):
         else:
             pageDetails = page.objects.filter(slug=obj)
             context['pageDetails'] = pageDetails
-            pageTranslationDetails = pageTranslation.objects.filter(page=obj)
-            context['pageTranslationDetails'] = pageTranslationDetails
-            for i in pageTranslationDetails:
-                print("page",i.language)
+            # pageTranslationDetails = pageTranslation.objects.filter(page=obj)
+            # context['pageTranslationDetails'] = pageTranslationDetails
+            pageList = {}
+            pageTranslationDetails = pageTranslation.objects.raw("select * from pagetranslation_pagetranslation as pt inner join language_language l on pt.language_id = l.locale where pt.page_id='"+obj+"'")
+
+            for lang in languageData:
+                for i in pageTranslationDetails:
+                    if i.locale == lang.locale:
+                        pageList[lang.locale] = {"language":i.locale,'title':i.title,"content":i.content,"contentId":i.contentId}
+                print("page",pageList[lang.locale])
+
+            context['pageList'] = pageList
+
+            
 
             if request.method == 'POST':
                 slug = request.POST['slug']
@@ -82,7 +99,7 @@ class PageAdmin(admin.ModelAdmin):
                     translation = pageTranslation.objects.filter(contentId=contentId).update(page=pg,title=title,content=content,language=lang)
                     
             
-            
+                messages.success(request,slug+" updated successfully")
                 return HttpResponseRedirect('/admin/Page/page/')
         
 

@@ -14,7 +14,14 @@
 <script>
   $(function () {
 
-    $("#tabs").tabs();
+    $(".tabs").tabs();
+  });
+  $('#submit').click(function () {
+  if(error == 0){ 
+            $(this).focus();
+            var tab = $(this).closest('.tabs').attr('id');
+            $('.tabs a[href="#' + tab + '"]').tab('show');
+}
   });
   </script>
 {% endblock %}
@@ -22,107 +29,129 @@
 {% block content %}
 
 <body>
-  {% if pageDetails is None  and pageTranslation is None %}
-    <form method="post">
-      
-      <table>
-        <td>Slug</td>
-        <td><input type="text" id="slug" name="slug" required></td>
-        <tr></tr>
-        <td>Status</td><td>
-          <select id="status" name="status" required>
-            <option value="enabled">Enable</option>
-            <option value="disabled">Disable</option>
-          </select></td>
-          <tr></tr>
-        <td>Sort Order</td>
-        <td><input type="number" id="order" name="order"></td>
-        <tr></tr>
-      </table>
-      
+  {% if pageList is None %}
+    
 
-    <div id="tabs">
-      <ul>{% for i in language %}
-        <li><a href="#{{i.locale}}">{{i.title}}</a></li>
-        {% endfor %}
-      </ul>
-      
-      {% for i in language %}
-      <div id="{{i.locale}}">
+  <div class="tabs">
+    <ul>
+      <li><a href="#page">Page</a></li>
+      <li><a href="#translation">Translation</a></li>
+    </ul>
+    <div id="page">
+      <form method="post">
         
         <table>
-          <td>Title:</td>
-          <td><input type="text" id="{{i.locale}}title" name="{{i.locale}}title" required/></td>
+          <td>Slug</td>
+          <td><input type="text" id="slug" name="slug" required></td>
           <tr></tr>
-          <td>Content:</td>
-          <td>
-            <textarea id='{{i.locale}}content' name="{{i.locale}}content" required></textarea>
-            <input type="hidden" id="{{i.locale}}lang" name="{{i.locale}}lang" value="{{i.locale}}"/>
-            
-          </td>
+          <td>Status</td><td>
+            <select id="status" name="status" required>
+              <option value="enabled">Enable</option>
+              <option value="disabled">Disable</option>
+            </select></td>
+            <tr></tr>
+          <td>Sort Order</td>
+          <td><input type="number" id="order" name="order"></td>
           <tr></tr>
         </table>
-          
-      </div>
-      {% endfor %}
-      
-      
-
     </div>
+    <div id="translation">
+      <div class="tabs">
+        <ul>{% for i in language %}
+          <li><a href="#{{i.locale}}">{{i.title}}</a></li>
+          {% endfor %}
+        </ul>
+        
+        {% for i in language %}
+        <div id="{{i.locale}}">
+          
+          <table>
+            <td>Title:</td>
+            <td><input type="text" id="{{i.locale}}title" name="{{i.locale}}title" required/></td>
+            <tr></tr>
+            <td>Content:</td>
+            <td>
+              <textarea rows="5" cols="40" id='{{i.locale}}content' name="{{i.locale}}content" required></textarea>
+              <input type="hidden" id="{{i.locale}}lang" name="{{i.locale}}lang" value="{{i.locale}}"/>
+              
+            </td>
+            <tr></tr>
+          </table>
+            
+        </div>
+        {% endfor %}
+        
+        
+
+      </div>
+    </div>
+  </div>
     {% csrf_token %}
     <input type="submit" value="Save">
     </form>
     {% else %}
-
-  <form method="post">
-    {% for i in pageDetails %}
-    <table>
-      <td>Slug</td>
-      <td><input type="text" id="slug" name="slug" value="{{i.slug}}" required></td>
-      <tr></tr>
-      <td>Status</td><td>
-        <select id="status" name="status" required>
-          <option value="enabled"  {% if i.status == "enabled" %} selected {% endif %}>Enable</option>
-          <option value="disabled" {% if i.status == "disabled" %} selected {% endif %}>Disable</option>
-        </select></td>
-        <tr></tr>
-      <td>Sort Order</td>
-      <td><input type="number" id="order" name="order" value="{{i.sortOrder}}"></td>
-      <tr></tr>
-    </table>
-    {% endfor %}
+  
     
-  <div id="tabs">
-    <ul>{% for i in language %}
-      <li><a href="#{{i.locale}}">{{i.title}}</a></li>
-      {% endfor %}
+  <div class="tabs">
+    <ul>
+      <li><a href="#page">Page</a></li>
+      <li><a href="#translation">Translation</a></li>
     </ul>
-    {% for page in pageTranslationDetails %}
-    {% for i in language %}
-    {% if i.title == page.language|stringformat:"s" %}
-    <div id="{{i.locale}}">
-      
-      <table>
-        <td>Title:</td>
-        <td><input type="text" id="{{i.locale}}title" name="{{i.locale}}title" value="{{page.title}}" required/></td>
-        <tr></tr>
-        <td>Content:</td>
-        <td>
-          <textarea id='{{i.locale}}content' name="{{i.locale}}content"  required>{{page.content}}</textarea>
-          <input type="hidden" id="{{i.locale}}lang" name="{{i.locale}}lang" value="{{i.locale}}"/>
-          <input type="hidden" id="{{i.locale}}contentId" name="{{i.locale}}contentId" value="{{page.contentId}}"/>
-        </td>
-        <tr></tr>
-      </table>
-        
+   
+    <div id="page">
+      <form method="post">
+        {% for i in pageDetails %}
+        <table>
+          <td>Slug</td>
+          <td><input type="text" id="slug" name="slug" value="{{i.slug}}" required></td>
+          <tr></tr>
+          <td>Status</td><td>
+            <select id="status" name="status" required>
+              <option value="enabled"  {% if i.status == "enabled" %} selected {% endif %}>Enable</option>
+              <option value="disabled" {% if i.status == "disabled" %} selected {% endif %}>Disable</option>
+            </select></td>
+            <tr></tr>
+          <td>Sort Order</td>
+          <td><input type="number" id="order" name="order" value="{{i.sortOrder}}"></td>
+          <tr></tr>
+        </table>
+        {% endfor %}
     </div>
-    {% endif %}
-    {% endfor %}
-    {% endfor %}
-    
+    <div id="translation">
+      <div class="tabs">
+        <ul>{% for i in language %}
+          <li><a href="#{{i.locale}}">{{i.title}}</a></li>
+          {% endfor %}
+        </ul>
+        
+        {% for i in language %}
+        {% if i.locale == pageList|get_item:i.locale|get_item:'language' %}
+        
+        <div id="{{i.locale}}">
+          
+          <table>
+            <td>Title:</td>
+            <td><input type="text" id="{{i.locale}}title" name="{{i.locale}}title" value="{{pageList|get_item:i.locale|get_item:'title'}}" required/></td>
+            <tr></tr>
+            <td>Content:</td>
+            <td>
+              <textarea rows="5" cols="40" id='{{i.locale}}content' name="{{i.locale}}content"  required>{{pageList|get_item:i.locale|get_item:'content'}}</textarea>
+              <input type="hidden" id="{{i.locale}}lang" name="{{i.locale}}lang" value="{{pageList|get_item:i.locale|get_item:'language'}}"/>
+              <input type="hidden" id="{{i.locale}}contentId" name="{{i.locale}}contentId" value="{{pageList|get_item:i.locale|get_item:'contentId'}}"/>
+            </td>
+            <tr></tr>
+          </table>
+            
+        </div>
+        {% endif %}
+        {% endfor %}
+        
+        
+      </div>
+    </div>
   </div>
   {% csrf_token %}
-  <input type="submit" value="Save">
+  <input type="submit" id="submit" value="Save">
   </form>
 
   {% endif %}

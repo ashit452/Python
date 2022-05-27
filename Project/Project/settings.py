@@ -42,6 +42,10 @@ INSTALLED_APPS = [
     'Language',
     'Page',
     'PageTranslation',
+    'Attribute',
+    'Option',
+    'AttributeTranslation',
+    'OptionTranslation',
 ]
 
 MIDDLEWARE = [
