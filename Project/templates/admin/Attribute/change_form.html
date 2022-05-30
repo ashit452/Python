@@ -1,0 +1,116 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+
+{% block extrahead %}
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>jQuery UI Tabs - Default functionality</title>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+<script>
+  $(function () {
+
+    $(".tabs").tabs();
+  });
+//   $('#submit').click(function () {
+//   if(error == 0){ 
+//             $(this).focus();
+//             var tab = $(this).closest('.tabs').attr('id');
+//             $('.tabs a[href="#' + tab + '"]').tab('show');
+// }
+//   });
+  </script>
+{% endblock %}
+
+{% block content %}
+
+<body>
+ 
+    
+
+  <div class="tabs" id="attributediv">
+    <ul>
+      <li><a href="#information">Information</a></li>
+      
+    </ul>
+    <div id="information">
+      <form method="post">
+        
+        <table>
+          {% for i in language %}
+          <td>Name [{{i.locale}}]</td>
+          <td><input type="text" id="{{i.locale}}name" name="{{i.locale}}name" required></td>
+          <tr></tr>
+          {% endfor %}
+          <td>Code</td>
+          <td><input type="text" id="code" name="code" required></td>
+          <tr></tr>
+          <td>Input Type</td><td>
+            <select id="inputtype" name="inputtype" required>
+              <option value="boolean">Boolean</option>
+              <option value="checkbox">Checkbox</option>
+              <option value="radio">Radio</option>
+              <option value="select">Select</option>
+              <option value="multiselect">Multi-select</option>
+              <option value="textbox">TextBox</option>
+              <option value="textarea">Textarea</option>
+            </select></td>
+            <tr></tr>
+            <td>Is required?</td><td>
+              <select id="required" name="required" required>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select></td>
+              <tr></tr>
+          <td>Sort Order</td>
+          <td><input type="number" id="order" name="order"></td>
+          <tr></tr>
+        </table>
+    </div>
+    
+  </div>
+  <div class="tabs" id="optiondiv">
+    <ul>
+      <li><a href="#option">Option</a></li>
+      
+    </ul>
+    <div id="option">
+      <form method="post">
+        
+        <table>
+          {% for i in language %}
+            <th>Name [{{i.locale}}]</th>
+          {% endfor %}
+          <th>Custom Option</th>
+          <th>Sort Order</th>
+          <th>Default</th>
+          <tr></tr>
+          {% for i in language %}
+            <td><input type="text" id="{{i.locale}}opname" name="{{i.locale}}opname" required></td>
+          {% endfor %}
+          <td><input type="text" id="customoption" name="customoption" required></td>
+          
+          <td><input type="number" id="order" name="order" required></td>
+          
+          <td><input type="radio" id="default" name="default" required></td>
+          <tr></tr>
+          
+        </table>
+    </div>
+    
+  </div>
+    {% csrf_token %}
+  <div id="submitdiv">
+    <input type="submit" value="Save">
+  </div>
+    </form>
+    
+
+</body>
+<!-- Render the rest of the ChangeList view -->
+<!-- {{block.super}} -->
+{% endblock %}
