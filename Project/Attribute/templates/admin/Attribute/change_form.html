@@ -25,15 +25,15 @@
           var html = `<tr id="option-row">
             {% for i in language %}
               <td>
-                <input type="text" id="{{i.locale}}[${count}][opname]" name="{{i.locale}}[${count}][opname]" >
-                <input type="hidden" id="{{i.locale}}[${count}][oplanguage]" name="{{i.locale}}[${count}][oplanguage]" value="{{i.locale}}">
+                <input type="text" id="option{{i.locale}}[${count}][opname]" name="option{{i.locale}}[${count}][opname]" required>
+                <input type="hidden" id="option{{i.locale}}[${count}][oplanguage]" name="option{{i.locale}}[${count}][oplanguage]" value="{{i.locale}}">
               </td>
             {% endfor %}
-            <td><input type="text" id="option[${count}][customoption]" name="option[${count}][customoption]" ></td>
+            <td><input type="text" id="option[${count}][customoption]" name="option[${count}][customoption]" required></td>
             
-            <td><input type="number" id"option[${count}][order]" name="option[${count}][order]" ></td>
+            <td><input type="number" id"option[${count}][order]" name="option[${count}][order]" required></td>
             
-            <td><input type="radio" id="option[${count}][default]" name="option[${count}][default]" ></td>
+            <td><input type="checkbox" id="option[${count}][default]" name="option[${count}][default]" ></td>
             <td class="delete"><img src="{% static 'images/delete.png' %}" height="30px" width="30px"></td>
           </tr>`;
           console.log(html);
@@ -51,6 +51,16 @@
     
 
     var arr = ['radio','select','multiselect','checkbox']
+
+    if(jQuery.inArray($("#inputtype").val(),arr) != -1){
+        $("#optiondiv").show()
+        $("#option-row td input").prop('required',true);
+      }
+      else{
+        $("#optiondiv").hide()
+        $("#option-row td input").prop('required',false);
+      }
+
     $("#inputtype").change(function(){
       if(jQuery.inArray($("#inputtype").val(),arr) != -1){
         $("#optiondiv").show()
@@ -72,13 +82,14 @@
 <body>
  
     
-
+  {% if attributeNames is None and optionNames is None %}
   <div class="tabs" id="attributediv">
     <ul>
       <li><a href="#information">Information</a></li>
       
     </ul>
     <div id="information">
+      
       <form method="post">
         
         <table>
@@ -140,15 +151,15 @@
                 <tr id="option-row">
                   {% for i in language %}
                     <td>
-                      <input type="text" id="{{i.locale}}[0][opname]" name="{{i.locale}}[0][opname]" >
-                      <input type="hidden" id="{{i.locale}}[0][oplanguage]" name="{{i.locale}}[0][oplanguage]" value="{{i.locale}}">
+                      <input type="text" id="option{{i.locale}}opname[]" name="option{{i.locale}}[0][opname]" >
+                      <input type="hidden" id="option{{i.locale}}[0][oplanguage]" name="option{{i.locale}}[0][oplanguage]" value="{{i.locale}}">
                     </td>
                   {% endfor %}
                   <td><input type="text" id="option[0][customoption]" name="option[0][customoption]" ></td>
                   
                   <td><input type="number" id="option[0][order]" name="option[0][order]" ></td>
                   
-                  <td><input type="radio" id="option[0][default]" name="option[0][default]" ></td>
+                  <td><input type="checkbox" id="option[0][default]" name="option[0][default]" ></td>
                   <td class="delete"><img src="{% static 'images/delete.png' %}" height="30px" width="30px"></td>
                 </tr>
               </table>
@@ -164,6 +175,109 @@
     <input type="submit" value="Save">
   </div>
     </form>
+    {% else %}
+    <div class="tabs" id="attributediv">
+      <ul>
+        <li><a href="#information">Information</a></li>
+        
+      </ul>
+      <div id="information">
+    <form method="post">
+        
+      <table>
+        {% for i in language %}
+        {% if i.locale == attributeNames|get_item:i.locale|get_item:'language' %}
+        <tr>
+          <td>Name [{{i.locale}}]</td>
+          <td>
+            <input type="text" id="{{i.locale}}name" name="{{i.locale}}name" value="{{attributeNames|get_item:i.locale|get_item:'name'}}"  required>
+            <input type="hidden" id="{{i.locale}}language" name="{{i.locale}}language" value="{{i.locale}}">
+          </td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+        <tr>
+          {% for i in attributeDetails %}
+          <td>Code</td>
+          <td><input type="text" id="code" name="code" value="{{i.code}}" required></td>
+        </tr>
+        <tr>
+          <td>Input Type</td><td>
+            <select id="inputtype" name="inputtype" required>
+              <option value="boolean" {% if i.inputType == "boolean" %} selected {% endif %}>Boolean</option>
+              <option value="checkbox" {% if i.inputType == "checkbox" %} selected {% endif %}>Checkbox</option>
+              <option value="radio" {% if i.inputType == "radio" %} selected {% endif %}>Radio</option>
+              <option value="select">Select</option>
+              <option value="multiselect" {% if i.inputType == "multiselect" %} selected {% endif %}>Multi-select</option>
+              <option value="textbox" {% if i.inputType == "textbox" %} selected {% endif %}>TextBox</option>
+              <option value="textarea" {% if i.inputType == "textarea" %} selected {% endif %}>Textarea</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>Is required?</td><td>
+            <select id="required" name="required" required>
+              <option value="yes" {% if i.isRequired == "yes" %} selected {% endif %}>Yes</option>
+              <option value="no" {% if i.isRequired == "no" %} selected {% endif %}>No</option>
+            </select></td>
+        </tr>
+        {% endfor %}
+
+        
+      </table>
+      
+      <div class="tabs" id="optiondiv">
+        <ul>
+          <li><a href="#option">Option</a></li>
+          
+        </ul>
+        <div id="option">
+          
+            
+            <table id="tbl">
+              <tr>
+                {% for i in language %}
+                  <th>Name [{{i.locale}}]</th>
+                {% endfor %}
+                <th>Custom Option</th>
+                <th>Sort Order</th>
+                <th>Default</th>
+                <th id="add"><img src="{% static 'images/add.png' %}" height="30x" width="30px"></th>
+              </tr>
+              <tr id="option-row">
+                {% for i in optionDetails %}
+                {% for j in language %}
+                {% if j.locale == optionNames|get_item:j.locale|get_item:'language' %}
+                  <td>
+                    <input type="text" id="{{j.locale}}opname[]" name="{{j.locale}}[0][opname]" value="{{optionNames|get_item:j.locale|get_item:'name'}}" >
+                    <input type="hidden" id="{{j.locale}}[0][oplanguage]" name="{{j.locale}}[0][oplanguage]" value="{{j.locale}}">
+                  </td>
+                {% endif %}
+                {% endfor %}
+                
+                <td><input type="text" id="option[0][customoption]" name="option[0][customoption]" value="{{i.customOption}}" ></td>
+                
+                <td><input type="number" id="option[0][order]" name="option[0][order]" value="{{i.sortOrder}}"></td>
+                
+                <td><input type="checkbox" id="option[0][default]" name="option[0][default]" {% if i.default == "true" %} checked {% endif %} ></td>
+                <td class="delete"><img src="{% static 'images/delete.png' %}" height="30px" width="30px"></td>
+              </tr>
+                {% endfor %}
+            </table>
+        </div>
+        
+      </div>
+  </div>
+  
+</div>
+
+  {% csrf_token %}
+<div id="submitdiv">
+  <input type="submit" value="Save">
+</div>
+  </form>
+
+  {% endif %}
     
 
 </body>
