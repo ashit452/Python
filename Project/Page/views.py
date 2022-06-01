@@ -27,12 +27,12 @@ def page_details(request,slug):
         return JsonResponse(msg)
 
     if "defaultLanguage" in request.session:
-        pageDetails = pageTranslation.objects.raw("select * from pagetranslation_pagetranslation as c inner join language_language as l on c.language_id=l.locale where c.page_id='"+slug+"' and l.locale= '"+request.session['defaultLanguage']+"'")
-        pageData = pageTranslation.objects.raw("select * from pagetranslation_pagetranslation as c inner join language_language as l on c.language_id=l.locale where l.locale= '"+request.session['defaultLanguage']+"'")
+        pageDetails = pageTranslation.objects.raw("select * from page_pagetranslation as c inner join language_language as l on c.language_id=l.locale where c.page_id='"+slug+"' and l.locale= '"+request.session['defaultLanguage']+"'")
+        pageData = pageTranslation.objects.raw("select * from page_pagetranslation as c inner join language_language as l on c.language_id=l.locale where l.locale= '"+request.session['defaultLanguage']+"'")
         
     else:
-        pageDetails = pageTranslation.objects.raw("select * from pagetranslation_pagetranslation as c inner join language_language as l on c.language_id=l.locale where c.page_id='"+slug+"' and l.isDefault= 1")
-        pageData = pageTranslation.objects.raw("select * from pagetranslation_pagetranslation as c inner join language_language as l on c.language_id=l.locale where l.isDefault= 1")
+        pageDetails = pageTranslation.objects.raw("select * from page_pagetranslation as c inner join language_language as l on c.language_id=l.locale where c.page_id='"+slug+"' and l.isDefault= 1")
+        pageData = pageTranslation.objects.raw("select * from page_pagetranslation as c inner join language_language as l on c.language_id=l.locale where l.isDefault= 1")
         
     for i in pageDetails:
         request.session["defaultLanguage"]=i.locale

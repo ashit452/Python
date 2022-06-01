@@ -60,7 +60,7 @@ class PageAdmin(admin.ModelAdmin):
             # pageTranslationDetails = pageTranslation.objects.filter(page=obj)
             # context['pageTranslationDetails'] = pageTranslationDetails
             pageList = {}
-            pageTranslationDetails = pageTranslation.objects.raw("select * from pagetranslation_pagetranslation as pt inner join language_language l on pt.language_id = l.locale where pt.page_id='"+obj+"'")
+            pageTranslationDetails = pageTranslation.objects.raw("select * from page_pagetranslation as pt inner join language_language l on pt.language_id = l.locale where pt.page_id='"+obj+"'")
 
             for lang in languageData:
                 for i in pageTranslationDetails:
