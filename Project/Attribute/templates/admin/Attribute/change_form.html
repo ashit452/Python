@@ -1,0 +1,172 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+
+{% block extrahead %}
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>jQuery UI Tabs - Default functionality</title>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+<script>
+  $(function () {
+    $(".tabs").tabs();
+    $('#optiondiv').hide();
+
+    var count=1;
+    $("#add").click(function () {
+      
+      if (count<10){
+
+          var html = `<tr id="option-row">
+            {% for i in language %}
+              <td>
+                <input type="text" id="{{i.locale}}[${count}][opname]" name="{{i.locale}}[${count}][opname]" >
+                <input type="hidden" id="{{i.locale}}[${count}][oplanguage]" name="{{i.locale}}[${count}][oplanguage]" value="{{i.locale}}">
+              </td>
+            {% endfor %}
+            <td><input type="text" id="option[${count}][customoption]" name="option[${count}][customoption]" ></td>
+            
+            <td><input type="number" id"option[${count}][order]" name="option[${count}][order]" ></td>
+            
+            <td><input type="radio" id="option[${count}][default]" name="option[${count}][default]" ></td>
+            <td class="delete"><img src="{% static 'images/delete.png' %}" height="30px" width="30px"></td>
+          </tr>`;
+          console.log(html);
+          $("#tbl").append(html);
+          count ++;
+      }
+      
+      
+    });
+
+    $(".delete").click(function () {
+      $("#option-row").remove();
+      
+    });
+    
+
+    var arr = ['radio','select','multiselect','checkbox']
+    $("#inputtype").change(function(){
+      if(jQuery.inArray($("#inputtype").val(),arr) != -1){
+        $("#optiondiv").show()
+        $("#option-row td input").prop('required',true);
+      }
+      else{
+        $("#optiondiv").hide()
+        $("#option-row td input").prop('required',false);
+      }
+    });
+  });
+
+  
+  </script>
+{% endblock %}
+
+{% block content %}
+
+<body>
+ 
+    
+
+  <div class="tabs" id="attributediv">
+    <ul>
+      <li><a href="#information">Information</a></li>
+      
+    </ul>
+    <div id="information">
+      <form method="post">
+        
+        <table>
+          {% for i in language %}
+          <tr>
+            <td>Name [{{i.locale}}]</td>
+            <td>
+              <input type="text" id="{{i.locale}}name" name="{{i.locale}}name" required>
+              <input type="hidden" id="{{i.locale}}language" name="{{i.locale}}language" value="{{i.locale}}">
+            </td>
+          </tr>
+          {% endfor %}
+          <tr>
+            <td>Code</td>
+            <td><input type="text" id="code" name="code" required></td>
+          </tr>
+          <tr>
+            <td>Input Type</td><td>
+              <select id="inputtype" name="inputtype" required>
+                <option value="boolean">Boolean</option>
+                <option value="checkbox">Checkbox</option>
+                <option value="radio">Radio</option>
+                <option value="select">Select</option>
+                <option value="multiselect">Multi-select</option>
+                <option value="textbox">TextBox</option>
+                <option value="textarea">Textarea</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Is required?</td><td>
+              <select id="required" name="required" required>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select></td>
+          </tr>
+  
+          
+        </table>
+        
+        <div class="tabs" id="optiondiv">
+          <ul>
+            <li><a href="#option">Option</a></li>
+            
+          </ul>
+          <div id="option">
+            
+              
+              <table id="tbl">
+                <tr>
+                  {% for i in language %}
+                    <th>Name [{{i.locale}}]</th>
+                  {% endfor %}
+                  <th>Custom Option</th>
+                  <th>Sort Order</th>
+                  <th>Default</th>
+                  <th id="add"><img src="{% static 'images/add.png' %}" height="30x" width="30px"></th>
+                </tr>
+                <tr id="option-row">
+                  {% for i in language %}
+                    <td>
+                      <input type="text" id="{{i.locale}}[0][opname]" name="{{i.locale}}[0][opname]" >
+                      <input type="hidden" id="{{i.locale}}[0][oplanguage]" name="{{i.locale}}[0][oplanguage]" value="{{i.locale}}">
+                    </td>
+                  {% endfor %}
+                  <td><input type="text" id="option[0][customoption]" name="option[0][customoption]" ></td>
+                  
+                  <td><input type="number" id="option[0][order]" name="option[0][order]" ></td>
+                  
+                  <td><input type="radio" id="option[0][default]" name="option[0][default]" ></td>
+                  <td class="delete"><img src="{% static 'images/delete.png' %}" height="30px" width="30px"></td>
+                </tr>
+              </table>
+          </div>
+          
+        </div>
+    </div>
+    
+  </div>
+  
+    {% csrf_token %}
+  <div id="submitdiv">
+    <input type="submit" value="Save">
+  </div>
+    </form>
+    
+
+</body>
+<!-- Render the rest of the ChangeList view -->
+<!-- {{block.super}} -->
+{% endblock %}

@@ -1,13 +1,12 @@
 from django.shortcuts import render,redirect
-from Page.models import page
+from Page.models import page,pageTranslation
 from Language.models import language
-from PageTranslation.models import pageTranslation
 from django.http import JsonResponse
 
 # Create your views here.
 def home(request):
     pages = page.objects.filter(status="enabled").order_by('sortOrder')
-    return render(request, 'Page/index.html',{'pages':pages})
+    return render(request, 'index.html',{'pages':pages})
 
 
 def page_list():
@@ -43,4 +42,4 @@ def page_details(request,slug):
        
 
     print(request.session['defaultLanguage'])
-    return render(request,'Page/slugpage.html',{'page':pageDetails,'pageData':pageData,'pages':pages,'languages':languages,'languageSession':request.session['defaultLanguage']})
+    return render(request,'slugpage.html',{'page':pageDetails,'pageData':pageData,'pages':pages,'languages':languages,'languageSession':request.session['defaultLanguage']})

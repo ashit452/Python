@@ -1,9 +1,7 @@
 from django.contrib import admin
 from django.http import HttpResponseRedirect
-from Page.models import page
+from Page.models import page,pageTranslation
 from Language.models import language
-from PageTranslation.models import pageTranslation
-from PageTranslation.forms import PageTranslationForm
 from django.contrib import messages
 from django.template.defaulttags import register
 ...

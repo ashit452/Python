@@ -41,11 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Language',
     'Page',
-    'PageTranslation',
     'Attribute',
-    'Option',
-    'AttributeTranslation',
-    'OptionTranslation',
 ]
 
 MIDDLEWARE = [
