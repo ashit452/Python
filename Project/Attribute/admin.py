@@ -13,6 +13,7 @@ def get_item(dictionary, key):
 
 # Register your models here.
 class AttributeAdmin(admin.ModelAdmin):
+    list_display = ['code','inputType','isRequired']
     def changeform_view(self, request, obj, form_url, context=None):
         context = context or {}
         languageData = language.objects.filter(status = "enabled")
@@ -44,8 +45,11 @@ class AttributeAdmin(admin.ModelAdmin):
                     for key in request.POST.keys():
                         if(reObj.match(key)):
                             ls.append(key)
+
+                    div = (language.objects.count() * 2) + 3
+                    print(div)
                             
-                    for i in range(round(len(ls)/7)):
+                    for i in range(round(len(ls)/div)):
                         print(i)
                         customOption = request.POST['option['+str(i)+'][customoption]']
                         order = request.POST['option['+str(i)+'][order]']
@@ -94,12 +98,18 @@ class AttributeAdmin(admin.ModelAdmin):
 
             optionNames = {}
             optionTranslationDetails = optionTranslation.objects.raw("select * from attribute_optiontranslation as ot inner join language_language l on ot.language_id = l.locale inner join attribute_option as o on o.optionId=ot.option_id where o.attribute_id='"+obj+"'")
+            context['optionTranslationDetails'] = optionTranslationDetails
 
             for lang in languageData:
+                optionNames[lang.locale] = {}
                 for i in optionTranslationDetails:
-                    if lang.locale == i.locale:
-                        optionNames[lang.locale] = {"language":i.locale,'name':i.name,"optionTranslationId":i.optionTranslationId}
-                print("option",optionNames[lang.locale])
+                    if i.locale == lang.locale:
+                        optionNames[lang.locale][i.customOption]= {"language":i.locale,'name':i.name,"optionTranslationId":i.optionTranslationId}
+            # for j in attributeDetails:
+            #     for i in optionTranslationDetails:
+            #         optionNames[i.customOption] ={}
+            #         optionNames[i.customOption][i.locale] = {"language":i.locale,'name':i.name,"optionTranslationId":i.optionTranslationId}
+            print("option",optionNames)
 
             context['optionNames'] = optionNames
 
@@ -107,7 +117,4 @@ class AttributeAdmin(admin.ModelAdmin):
         return super(AttributeAdmin,self).changeform_view(request, obj ,form_url,context)
 
 admin.site.register(attribute,AttributeAdmin)
-admin.site.register(option)
-admin.site.register(attributeTranslation)
-admin.site.register(optionTranslation)
 

@@ -247,9 +247,9 @@
               <tr id="option-row">
                 {% for i in optionDetails %}
                 {% for j in language %}
-                {% if j.locale == optionNames|get_item:j.locale|get_item:'language' %}
+                {% if j.locale == optionNames|get_item:j.locale|get_item:i.customOption|get_item:'language' %}
                   <td>
-                    <input type="text" id="{{j.locale}}opname[]" name="{{j.locale}}[0][opname]" value="{{optionNames|get_item:j.locale|get_item:'name'}}" >
+                    <input type="text" id="{{j.locale}}opname[]" name="{{j.locale}}[0][opname]" value="{{optionNames|get_item:j.locale|get_item:i.customOption|get_item:'name'}}" >
                     <input type="hidden" id="{{j.locale}}[0][oplanguage]" name="{{j.locale}}[0][oplanguage]" value="{{j.locale}}">
                   </td>
                 {% endif %}
