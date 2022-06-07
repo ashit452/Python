@@ -14,7 +14,7 @@ class language(models.Model):
     status = models.CharField(max_length=10,choices=statusChoice,default='enabled')
 
     def __str__(self):
-        return str(self.title)  
+        return str(self.locale)  
 
     def save(self, *args, **kwargs):
         if not self.isDefault:

@@ -23,6 +23,9 @@ class attribute(models.Model):
     )
     isRequired = models.CharField(("Is Required"),max_length=10,choices=requiredChoice,default='yes')
 
+    def __str__(self):
+        return str(self.code)
+
 class attributeTranslation(models.Model):
     attributeTranslationId = models.AutoField(primary_key=True)
     language = models.ForeignKey(language,on_delete = models.CASCADE,null=False)
