@@ -1,0 +1,162 @@
+{% extends "admin/index.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrastyle %}{{ block.super }}{% endblock %}
+
+{% block extrahead %}{{ block.super }}
+<script src="{% url 'admin:jsi18n' %}"></script>
+{{ media }}
+{% endblock %}
+
+
+
+
+{% block content %}
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+              <div class="container-fluid">
+                <div>
+                  {% block messages %}
+                  {% if messages %}
+                      <ul class="messagelist">{% for message in messages %}
+                      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
+                      {% endfor %}</ul>
+                  {% endif %}
+                  {% endblock messages %}
+              </div>
+                <div class="row mb-2">
+                  <div class="col-sm-6">
+                    <h1> {{ opts.verbose_name_plural|capfirst }}</h1>
+                  </div>
+                  <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                      <li class="breadcrumb-item"><a href="#">Home</a></li>
+                      <li class="breadcrumb-item"> {% if has_view_permission %}<a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}</li>
+                      <li class="breadcrumb-item"> {% if add %}{% blocktranslate with name=opts.verbose_name %}Add {{ name }}{% endblocktranslate %}{% else %}{{ original|truncatewords:"18" }}{% endif %}</li>
+                    </ol>
+                  </div>
+                </div>
+              </div><!-- /.container-fluid -->
+            </section>
+            <section class="content">
+                <div class="container-fluid">
+                  
+                <div class="text-right">
+                  {% block object-tools %}
+                            {% if change %}{% if not is_popup %}
+                              <ul class="object-tools" style="list-style: None;"">
+                                {% block object-tools-items %}
+                                  <button type="button" class="btn btn-outline-primary" >{% change_form_object_tools %}</button>
+                                {% endblock %}
+                              </ul>
+                            {% endif %}{% endif %}
+                            {% endblock %}
+                </div>
+                  <div class="row">
+                    <div class="col-12">
+          
+                      <!-- /.card -->
+          
+                      <div class="card">
+                        
+                        <div class="card-body">
+                          
+                            
+                            <form class="form-group" {% if has_file_field %}enctype="multipart/form-data" {% endif %}{% if form_url %}action="{{ form_url }}" {% endif %}method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
+                            
+                            {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
+                            {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
+                            {% if save_on_top %}{% block submit_buttons_top %}{% submit_row %}{% endblock %}{% endif %}
+                            {% if errors %}
+                                <p class="errornote">
+                                {% if errors|length == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate "Please correct the errors below." %}{% endif %}
+                                </p>
+                                {{ adminform.form.non_field_errors }}
+                            {% endif %}
+                            
+                            {% block field_sets %}
+                            {% for fieldset in adminform %}
+                              {% include "admin/includes/fieldset.html" %}
+                            {% endfor %}
+                            {% endblock %}
+                            
+                            {% block after_field_sets %}{% endblock %}
+                            
+                            {% block inline_field_sets %}
+                            {% for inline_admin_formset in inline_admin_formsets %}
+                                {% include inline_admin_formset.opts.template %}
+                            {% endfor %}
+                            {% endblock %}
+                            
+                            {% block after_related_objects %}{% endblock %}
+                            
+                            {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
+                            
+                            {% block admin_change_form_document_ready %}
+                                <script id="django-admin-form-add-constants"
+                                        src="{% static 'admin/js/change_form.js' %}"
+                                        {% if adminform and add %}
+                                            data-model-name="{{ opts.model_name }}"
+                                        {% endif %}
+                                        async>
+                                </script>
+                            {% endblock %}
+                            
+                            {# JavaScript for prepopulated fields #}
+                            {% prepopulated_fields_js %}
+                            
+                            
+                            </form>
+</div>
+<!-- /.col -->
+</div>
+<!-- /.row -->
+</div>
+<!-- /.container-fluid -->
+</div>
+</section>
+<!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+
+<footer class="main-footer">
+  <div class="float-right d-none d-sm-block">
+    <b>Version</b> 3.2.0
+  </div>
+  <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved.
+</footer>
+
+<!-- Control Sidebar -->
+<aside class="control-sidebar control-sidebar-dark">
+  <!-- Control sidebar content goes here -->
+</aside>
+<!-- /.control-sidebar -->
+
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery -->
+<script src="{% static 'admin/plugins/jquery/jquery.min.js' %}"></script>
+<!-- Bootstrap 4 -->
+<script src="{% static 'admin/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- DataTable Plugins -->
+
+<!-- AdminLTE App -->
+<script src="{% static 'admin//dist/js/adminlte.min.js' %}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{% static 'admin/dist/js/demo.js' %}"></script>
+<!-- Page specific script -->
+<script>
+    $(document).ready(function () {
+        var firstName = $('#firstName').text();
+        var lastName = $('#lastName').text();
+        var intials = firstName.charAt(0);
+        var profileImage = $('#profileImage').text(intials);
+    });
+</script>
+
+</body>
+{% endblock %}

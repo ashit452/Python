@@ -1,0 +1,35 @@
+
+{% load i18n static %}
+
+{% block extrastyle %}
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="{% static 'admin/plugins/fontawesome-free/css/all.min.css' %}">
+<!-- icheck bootstrap -->
+<link rel="stylesheet" href="{% static 'admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+<!-- Theme style -->
+<link rel="stylesheet" href="{% static 'admin/dist/css/adminlte.min.css' %}">
+
+
+
+{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block nav-sidebar %}{% endblock %}
+
+{% block content %}
+<body class="hold-transition login-page">
+
+<div class="card">
+    <div class="card-body login-card-body">
+
+        <p>{% translate "Thanks for spending some quality time with the Web site today." %}</p>
+
+        <p><a href="{% url 'admin:index' %}">{% translate 'Log in again' %}</a></p>
+
+    </div>
+</div>
+</body>
+{% endblock %}

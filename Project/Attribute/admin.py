@@ -25,7 +25,10 @@ class FetchDataError(Error):
 
 # Register your models here.
 class AttributeAdmin(admin.ModelAdmin):
-    list_display = ['code','inputType','isRequired']
+    list_display = ['code','inputType','isRequired','createdAt','updatedAt',]
+
+    
+
     def changeform_view(self, request, obj, form_url, context=None):
         context = context or {}
         languageData = language.objects.filter(status = "enabled")

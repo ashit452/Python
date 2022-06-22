@@ -12,6 +12,8 @@ class page(models.Model):
     )
     status = models.CharField(max_length=10,choices=statusChoice,default='enabled')
     sortOrder = models.IntegerField(("Sort Order"),default=0)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)
     
 
     def __str__(self):
@@ -30,6 +32,8 @@ class pageTranslation(models.Model):
     contentId = models.AutoField(primary_key=True)
     title = models.CharField(max_length=100)
     content = tinymce_models.HTMLField()
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "Page Translation"

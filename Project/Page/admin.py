@@ -13,7 +13,9 @@ def get_item(dictionary, key):
     
 class PageAdmin(admin.ModelAdmin):
     # inlines = [ContentInline,]
-    list_display = ['slug','status','sortOrder',]
+    list_display = ['slug','status','sortOrder','createdAt','updatedAt',]
+
+        
     def changeform_view(self, request,obj ,form_url,context=None):
         context = context or {}
         languageData = language.objects.filter(status = "enabled")
@@ -66,8 +68,7 @@ class PageAdmin(admin.ModelAdmin):
                 for i in pageTranslationDetails:
                     if i.locale == lang.locale:
                         pageList[lang.locale] = {"language":i.locale,'title':i.title,"content":i.content,"contentId":i.contentId}
-                print("page",pageList[lang.locale])
-
+                
             context['pageList'] = pageList
 
             

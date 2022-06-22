@@ -12,6 +12,8 @@ class language(models.Model):
         ('disabled','Disabled'),
     )
     status = models.CharField(max_length=10,choices=statusChoice,default='enabled')
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return str(self.locale)  

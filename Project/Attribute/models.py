@@ -22,6 +22,8 @@ class attribute(models.Model):
         ('no','No'),
     )
     isRequired = models.CharField(("Is Required"),max_length=10,choices=requiredChoice,default='yes')
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return str(self.code)
@@ -31,6 +33,8 @@ class attributeTranslation(models.Model):
     language = models.ForeignKey(language,on_delete = models.CASCADE,null=False)
     name = models.CharField(max_length=200)
     attribute = models.ForeignKey(attribute,on_delete=models.CASCADE,null=False)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)
 
 class option(models.Model):
     optionId = models.AutoField(primary_key=True)
@@ -38,6 +42,8 @@ class option(models.Model):
     customOption = models.CharField(("Custom Option"),max_length=100,unique=True)
     sortOrder = models.IntegerField(("Sort Order"),default=1)
     isDefault = models.BooleanField(("Is Default"),default=False)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
         if not self.isDefault:
@@ -52,5 +58,7 @@ class optionTranslation(models.Model):
     language = models.ForeignKey(language,on_delete = models.CASCADE,null=False)
     name = models.CharField(max_length=250)
     option = models.ForeignKey(option,on_delete=models.CASCADE,null=False)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)
 
      

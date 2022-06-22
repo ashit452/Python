@@ -1,0 +1,119 @@
+{% load static %}
+
+{% block extrastyle %}
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="{% static 'admin/plugins/fontawesome-free/css/all.min.css' %}">
+<!-- icheck bootstrap -->
+<link rel="stylesheet" href="{% static 'admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+<!-- Theme style -->
+<link rel="stylesheet" href="{% static 'admin/dist/css/adminlte.min.css' %}">
+
+
+{{ form.media }}
+{% endblock %}
+
+
+
+
+{% block content %}
+
+<head>
+  <title>Login</title>
+</head>
+
+<body class="hold-transition login-page">
+
+
+
+
+  <div class="login-box">
+    <div class="login-logo">
+      <a href="../../index2.html"><b>Admin</b>LTE</a>
+    </div>
+
+    <!-- /.login-logo -->
+    <div class="card">
+      {% if form.errors and not form.non_field_errors %}
+      <p class="errornote">
+        {% if form.errors.items|length == 1 %}"Please correct the error below." {% else %}"Please correct the errors
+        below."{% endif %}
+      </p>
+      {% endif %}
+
+
+
+      <div id="content-main">
+
+        {% if user.is_authenticated %}
+        <p class="errornote">
+
+          You are authenticated as {{ username }}, but are not authorized to
+          access this page. Would you like to login to a different account?
+
+        </p>
+        {% endif %}
+        <div class="card-body login-card-body">
+          {% if form.non_field_errors %}
+          {% for error in form.non_field_errors %}
+          <p style="background-color:red;color:#fff;" class="errornote">
+            {{ error }}
+          </p>
+          {% endfor %}
+          {% endif %}
+          <p class="login-box-msg">Sign in to start your session</p>
+
+          <form action="{{ app_path }}" method="post" id="login-form">
+            {% csrf_token %}
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" name="username" autofocus="" autocapitalize="none"
+                autocomplete="username" maxlength="150" required="" id="id_username">
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <span class="fas fa-user"></span>
+                </div>
+              </div>
+            </div>
+            <span>{{ form.username.errors }}</span>
+            <div class="input-group mb-3">
+              <input type="password" class="form-control" name="password" autocomplete="current-password" required=""
+                id="id_password">
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <span class="fas fa-lock"></span>
+                </div>
+              </div>
+            </div>
+            <span>{{ form.password.errors }}</span>
+
+
+            <!-- /.col -->
+            <div class="text-center mb-3">
+              <button type="submit" class="btn btn-block btn-primary">Sign In</button>
+            </div>
+            <!-- /.col -->
+
+
+          </form>
+        </div>
+
+
+      </div>
+      <!-- /.login-card-body -->
+    </div>
+  </div>
+
+  <!-- /.login-box -->
+
+  <!-- jQuery -->
+  <script src="{% static 'admin/plugins/jquery/jquery.min.js' %}"></script>
+  <!-- Bootstrap 4 -->
+  <script src="{% static 'admin/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <!-- AdminLTE App -->
+  <script src="{% static 'admin/dist/js/adminlte.min.js' %}"></script>
+
+</body>
+
+
+{% endblock %}

@@ -1,0 +1,194 @@
+
+{% extends 'admin/index.html' %}
+{% load i18n static %}
+{% load admin_urls static admin_list %}
+
+{% block extrastyle %}{{block.super}}
+
+<!-- DataTables -->
+<link rel="stylesheet" href="{% static 'admin/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'admin/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'admin/plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+<!-- <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}"> -->
+  {% if cl.formset %}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">
+  {% endif %}
+  {% if cl.formset or action_form %}
+    <script src="{% url 'admin:jsi18n' %}"></script>
+  {% endif %}
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+
+
+
+{% block content %}
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+              <div class="container-fluid">
+                <div>
+                    {% block messages %}
+                    {% if messages %}
+                        <ul class="messagelist">{% for message in messages %}
+                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
+                        {% endfor %}</ul>
+                    {% endif %}
+                    {% endblock messages %}
+                </div>
+                <div class="row mb-2">
+                  <div class="col-sm-6">
+                    <h1>{{ cl.opts.verbose_name_plural|capfirst }}</h1>
+                  </div>
+                  <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                      <li class="breadcrumb-item"><a href="#">Home</a></li>
+                      <li class="breadcrumb-item active">{{ cl.opts.verbose_name_plural|capfirst }}</li>
+                    </ol>
+                  </div>
+                </div>
+              </div><!-- /.container-fluid -->
+            </section>
+            <section class="content">
+                <div class="container-fluid">
+                  <div class="row">
+                    <div class="col-12">
+          
+                      <!-- /.card -->
+                        
+                      <div class="card">
+                        
+                        
+                        <div class="card-body results">
+                        <div id="content-main">
+                            {% block object-tools %}
+                            <ul class="object-tools text-right" style="list-style: none;">
+                                {% block object-tools-items %}
+                                  <button class="btn btn-outline-primary">{% change_list_object_tools %}</button>
+                                {% endblock %}
+                              </ul>
+                            {% endblock %}
+                            {% if cl.formset and cl.formset.errors %}
+                                <p class="errornote">
+                                {% if cl.formset.total_error_count == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate "Please correct the errors below." %}{% endif %}
+                                </p>
+                                {{ cl.formset.non_form_errors }}
+                            {% endif %}
+                        <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
+                            <div class="changelist-form-container">
+                              {% block search %}{% search_form cl %}{% endblock %}
+                              {% block date_hierarchy %}{% if cl.date_hierarchy %}{% date_hierarchy cl %}{% endif %}{% endblock %}
+                        <form id="changelist-form" method="post"{% if cl.formset and cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %} novalidate>{% csrf_token %}
+                            {% if cl.formset %}
+                              <div>{{ cl.formset.management_form }}</div>
+                            {% endif %}
+                        {% block result_list %}
+                        {% if action_form and actions_on_top and cl.show_admin_actions %}{% admin_actions %}{% endif %}
+                        {% result_list cl %}
+                        {% if action_form and actions_on_bottom and cl.show_admin_actions %}{% admin_actions %}{% endif %}
+                        
+                      {% endblock %}
+                      </form>
+                      </div>
+                      {% block filters %}
+        {% if cl.has_filters %}
+          <div id="changelist-filter">
+            <h2>{% translate 'Filter' %}</h2>
+            {% if cl.has_active_filters %}<h3 id="changelist-filter-clear">
+              <a href="{{ cl.clear_all_filters_qs }}">&#10006; {% translate "Clear all filters" %}</a>
+            </h3>{% endif %}
+            {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
+          </div>
+        {% endif %}
+      {% endblock %}
+                      </div>
+        <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+  </div>
+  <!-- /.col -->
+</div>
+<!-- /.row -->
+</div>
+<!-- /.container-fluid -->
+</div>
+</section>
+<!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+
+<footer class="main-footer">
+    <div class="float-right d-none d-sm-block">
+      <b>Version</b> 3.2.0
+    </div>
+    <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved.
+  </footer>
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
+
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery -->
+<script src="{% static 'admin/plugins/jquery/jquery.min.js' %}"></script>
+<!-- Bootstrap 4 -->
+<script src="{% static 'admin/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- DataTable Plugins -->
+<script src="{% static 'admin/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'admin/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'admin/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'admin/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<script src="{% static 'admin/plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'admin/plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static 'admin/plugins/jszip/jszip.min.js' %}"></script>
+<script src="{% static 'admin/plugins/pdfmake/pdfmake.min.js' %}"></script>
+<script src="{% static 'admin/plugins/pdfmake/vfs_fonts.js' %}"></script>
+<script src="{% static 'admin/plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'admin/plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'admin/plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static 'admin//dist/js/adminlte.min.js' %}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{% static 'admin/dist/js/demo.js' %}"></script>
+<!-- Page specific script -->
+<script>
+  $(function () {
+    // $(".actions").css("font-family", "Source Sans Pro",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol");
+    
+    $(".actions button").addClass("btn-primary");
+    $("#result_list").DataTable({
+      "responsive": true, "lengthChange": false, "autoWidth": false,"ordering": false,searching:false,
+      "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+    }).buttons().container().appendTo('.card-body');
+    $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      "responsive": true,
+    });
+  });
+</script>
+<script>
+    $(document).ready(function () {
+        var firstName = $('#firstName').text();
+        var lastName = $('#lastName').text();
+        var intials = firstName.charAt(0);
+        var profileImage = $('#profileImage').text(intials);
+    });
+</script>
+</body>
+{% endblock %}

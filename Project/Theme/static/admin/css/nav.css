@@ -1,0 +1,40 @@
+.main-sidebar{background-color:#fff;
+    color: #000 !important;
+}
+
+.brand-link{
+    background-color: #3f474e;
+    color: #fff;
+}
+
+.d-block{
+    color: black !important;
+}
+
+.form-control-sidebar{
+    background-color: #fff !important;
+    color: #3f474e !important;
+}
+
+.btn-sidebar{
+    background-color: #fff !important;
+    color: #3f474e !important;
+}
+
+.list-group-item{
+    background-color: #3f474e !important;
+    color: #fff !important;
+}
+
+.nav-header{
+    color: #000 !important;
+}
+
+.nav-link{
+    color: #000 !important;
+}
+
+.nav-sidebar .nav-link:hover {color: #fff !important;
+    opacity: 1;
+    background-color: #3f474e !important;
+}

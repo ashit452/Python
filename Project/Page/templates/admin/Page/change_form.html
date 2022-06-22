@@ -1,162 +1,275 @@
+
+
+
+
 {% extends "admin/change_form.html" %}
-{% load static %}
+{% load i18n admin_urls static admin_modify admin_list %}
 
+{% block extrastyle %}
+{{ block.super }}
 
-{% block extrahead %}
-
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>jQuery UI Tabs - Default functionality</title>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
 <link rel="stylesheet" href="/resources/demos/style.css">
-<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
-<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media }}
+
+
+
+
+{% endblock %}
+
+{% block content %}
+
+<body class="hold-transition sidebar-mini layout-fixed">
+  <div class="wrapper">
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <div class="container-fluid">
+          <div>
+            {% block messages %}
+            {% if messages %}
+                <ul class="messagelist">{% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
+                {% endfor %}</ul>
+            {% endif %}
+            {% endblock messages %}
+        </div>
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1> {{ opts.verbose_name_plural|capfirst }}</h1>
+            </div>
+            <div class="col-sm-6">
+              <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item"> {% if has_view_permission %}<a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}</li>
+                <li class="breadcrumb-item"> {% if add %}{% blocktranslate with name=opts.verbose_name %}Add {{ name }}{% endblocktranslate %}{% else %}{{ original|truncatewords:"18" }}{% endif %}</li>
+              </ol>
+            </div>
+          </div>
+        </div><!-- /.container-fluid -->
+      </section>
+      <section class="content">
+        <div class="container-fluid">
+          
+        
+          <div class="row">
+            <div class="col-12">
+
+              <!-- /.card -->
+
+              <div class="card">
+
+                <div class="card-body">
+
+                  {% if pageList is None %}
+
+
+                  <div class="tabs">
+                    <ul>
+                      <li><a href="#page">Page</a></li>
+                      <li><a href="#translation">Translation</a></li>
+                    </ul>
+                    <div id="page">
+                      <form class="form-group" method="post">
+
+                        <table>
+                          <td>Slug</td>
+                          <td><input class="form-control" type="text" id="slug" name="slug" required></td>
+                          <tr></tr>
+                          <td>Status</td>
+                          <td>
+                            <select class="form-control" id="status" name="status" required>
+                              <option value="enabled">Enable</option>
+                              <option value="disabled">Disable</option>
+                            </select>
+                          </td>
+                          <tr></tr>
+                          <td>Sort Order</td>
+                          <td><input class="form-control" type="number" id="order" name="order"></td>
+                          <tr></tr>
+                        </table>
+                    </div>
+                    <div id="translation">
+                      <div class="tabs">
+                        <ul>{% for i in language %}
+                          <li><a href="#{{i.locale}}">{{i.title}}</a></li>
+                          {% endfor %}
+                        </ul>
+
+                        {% for i in language %}
+                        <div id="{{i.locale}}">
+
+                          <table>
+                            <td>Title:</td>
+                            <td><input class="form-control" type="text" id="{{i.locale}}title" name="{{i.locale}}title" required /></td>
+                            <tr></tr>
+                            <td>Content:</td>
+                            <td>
+                              <textarea class="form-control" rows="5" cols="40" id='{{i.locale}}content' name="{{i.locale}}content"
+                                required></textarea>
+                              <input class="form-control" type="hidden" id="{{i.locale}}lang" name="{{i.locale}}lang" value="{{i.locale}}" />
+
+                            </td>
+                            <tr></tr>
+                          </table>
+
+                        </div>
+                        {% endfor %}
+
+
+
+                      </div>
+                    </div>
+                  </div>
+                  {% csrf_token %}
+                  <input class="btn btn-primary" type="submit" value="Save">
+                  </form>
+                  {% else %}
+
+
+                  <div class="tabs">
+                    <ul>
+                      <li><a href="#page">Page</a></li>
+                      <li><a href="#translation">Translation</a></li>
+                    </ul>
+
+                    <div id="page">
+                      <form class="form-group" method="post">
+                        {% for i in pageDetails %}
+                        <table>
+                          <td>Slug</td>
+                          <td><input class="form-control" type="text" id="slug" name="slug" value="{{i.slug}}" required></td>
+                          <tr></tr>
+                          <td>Status</td>
+                          <td>
+                            <select class="form-control" id="status" name="status" required>
+                              <option value="enabled" {% if i.status == 'enabled' %} selected {% endif %}>Enable</option>
+                              <option value="disabled" {% if i.status == 'disabled' %} selected {% endif %}>Disable
+                              </option>
+                            </select>
+                          </td>
+                          <tr></tr>
+                          <td>Sort Order</td>
+                          <td><input class="form-control" type="number" id="order" name="order" value="{{i.sortOrder}}"></td>
+                          <tr></tr>
+                        </table>
+                        {% endfor %}
+                    </div>
+                    <div id="translation">
+                      <div class="tabs">
+                        <ul>{% for i in language %}
+                          <li><a href="#{{i.locale}}">{{i.title}}</a></li>
+                          {% endfor %}
+                        </ul>
+
+                        {% for i in language %}
+                        {% if i.locale == pageList|get_item:i.locale|get_item:'language' %}
+
+                        <div id="{{i.locale}}">
+
+                          <table>
+                            <td>Title:</td>
+                            <td><input class="form-control" type="text" id="{{i.locale}}title" name="{{i.locale}}title" value="{{pageList|get_item:i.locale|get_item:'title'}}" required /></td>
+                            <tr></tr>
+                            <td>Content:</td>
+                            <td>
+                              <textarea class="form-control" rows="5" cols="40" id='{{i.locale}}content' name="{{i.locale}}content" required>{{pageList|get_item:i.locale|get_item:'content'}}</textarea>
+                              <input class="form-control" type="hidden" id="{{i.locale}}lang" name="{{i.locale}}lang"
+                                value="{{pageList|get_item:i.locale|get_item:'language'}}" />
+                              <input class="form-control" type="hidden" id="{{i.locale}}contentId" name="{{i.locale}}contentId"
+                                value="{{pageList|get_item:i.locale|get_item:'contentId'}}" />
+                            </td>
+                            <tr></tr>
+                          </table>
+
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+
+
+                      </div>
+                    </div>
+                  </div>
+                  {% csrf_token %}
+                  <input class="btn btn-primary" type="submit" id="submit" value="Save">
+                  </form>
+
+                  {% endif %}
+
+                </div>
+                <!-- /.col -->
+              </div>
+              <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+          </div>
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <footer class="main-footer">
+      <div class="float-right d-none d-sm-block">
+        <b>Version</b> 3.2.0
+      </div>
+      <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved.
+    </footer>
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+      <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+
+  </div>
+
+  <!-- jQuery -->
+  <script src="{% static 'admin/plugins/jquery/jquery.min.js' %}"></script>
+  <!-- Bootstrap 4 -->
+  <script src="{% static 'admin/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <!-- DataTable Plugins -->
+
+  <!-- AdminLTE App -->
+  <script src="{% static 'admin//dist/js/adminlte.min.js' %}"></script>
+  <!-- AdminLTE for demo purposes -->
+  <script src="{% static 'admin/dist/js/demo.js' %}"></script>
+  <!-- Page specific script -->
+  <script>
+    $(document).ready(function () {
+      var firstName = $('#firstName').text();
+      var lastName = $('#lastName').text();
+      var intials = firstName.charAt(0);
+      var profileImage = $('#profileImage').text(intials);
+    });
+  </script>
+
+
 <script>
   $(function () {
 
     $(".tabs").tabs();
   });
   $('#submit').click(function () {
-  if(error == 0){ 
-            $(this).focus();
-            var tab = $(this).closest('.tabs').attr('id');
-            $('.tabs a[href="#' + tab + '"]').tab('show');
-}
+    if (error == 0) {
+      $(this).focus();
+      var tab = $(this).closest('.tabs').attr('id');
+      $('.tabs a[href="#' + tab + '"]').tab('show');
+    }
   });
-  </script>
-{% endblock %}
+</script>
 
-{% block content %}
 
-<body>
-  {% if pageList is None %}
-    
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+  <script src="{% static 'admin/js/changeform-attribute.js' %}"></script>
 
-  <div class="tabs">
-    <ul>
-      <li><a href="#page">Page</a></li>
-      <li><a href="#translation">Translation</a></li>
-    </ul>
-    <div id="page">
-      <form method="post">
-        
-        <table>
-          <td>Slug</td>
-          <td><input type="text" id="slug" name="slug" required></td>
-          <tr></tr>
-          <td>Status</td><td>
-            <select id="status" name="status" required>
-              <option value="enabled">Enable</option>
-              <option value="disabled">Disable</option>
-            </select></td>
-            <tr></tr>
-          <td>Sort Order</td>
-          <td><input type="number" id="order" name="order"></td>
-          <tr></tr>
-        </table>
-    </div>
-    <div id="translation">
-      <div class="tabs">
-        <ul>{% for i in language %}
-          <li><a href="#{{i.locale}}">{{i.title}}</a></li>
-          {% endfor %}
-        </ul>
-        
-        {% for i in language %}
-        <div id="{{i.locale}}">
-          
-          <table>
-            <td>Title:</td>
-            <td><input type="text" id="{{i.locale}}title" name="{{i.locale}}title" required/></td>
-            <tr></tr>
-            <td>Content:</td>
-            <td>
-              <textarea rows="5" cols="40" id='{{i.locale}}content' name="{{i.locale}}content" required></textarea>
-              <input type="hidden" id="{{i.locale}}lang" name="{{i.locale}}lang" value="{{i.locale}}"/>
-              
-            </td>
-            <tr></tr>
-          </table>
-            
-        </div>
-        {% endfor %}
-        
-        
 
-      </div>
-    </div>
-  </div>
-    {% csrf_token %}
-    <input type="submit" value="Save">
-    </form>
-    {% else %}
-  
-    
-  <div class="tabs">
-    <ul>
-      <li><a href="#page">Page</a></li>
-      <li><a href="#translation">Translation</a></li>
-    </ul>
-   
-    <div id="page">
-      <form method="post">
-        {% for i in pageDetails %}
-        <table>
-          <td>Slug</td>
-          <td><input type="text" id="slug" name="slug" value="{{i.slug}}" required></td>
-          <tr></tr>
-          <td>Status</td><td>
-            <select id="status" name="status" required>
-              <option value="enabled"  {% if i.status == "enabled" %} selected {% endif %}>Enable</option>
-              <option value="disabled" {% if i.status == "disabled" %} selected {% endif %}>Disable</option>
-            </select></td>
-            <tr></tr>
-          <td>Sort Order</td>
-          <td><input type="number" id="order" name="order" value="{{i.sortOrder}}"></td>
-          <tr></tr>
-        </table>
-        {% endfor %}
-    </div>
-    <div id="translation">
-      <div class="tabs">
-        <ul>{% for i in language %}
-          <li><a href="#{{i.locale}}">{{i.title}}</a></li>
-          {% endfor %}
-        </ul>
-        
-        {% for i in language %}
-        {% if i.locale == pageList|get_item:i.locale|get_item:'language' %}
-        
-        <div id="{{i.locale}}">
-          
-          <table>
-            <td>Title:</td>
-            <td><input type="text" id="{{i.locale}}title" name="{{i.locale}}[title]" value="{{pageList|get_item:i.locale|get_item:'title'}}" required/></td>
-            <tr></tr>
-            <td>Content:</td>
-            <td>
-              <textarea rows="5" cols="40" id='{{i.locale}}content' name="{{i.locale}}content"  required>{{pageList|get_item:i.locale|get_item:'content'}}</textarea>
-              <input type="hidden" id="{{i.locale}}lang" name="{{i.locale}}lang" value="{{pageList|get_item:i.locale|get_item:'language'}}"/>
-              <input type="hidden" id="{{i.locale}}contentId" name="{{i.locale}}contentId" value="{{pageList|get_item:i.locale|get_item:'contentId'}}"/>
-            </td>
-            <tr></tr>
-          </table>
-            
-        </div>
-        {% endif %}
-        {% endfor %}
-        
-        
-      </div>
-    </div>
-  </div>
-  {% csrf_token %}
-  <input type="submit" id="submit" value="Save">
-  </form>
-
-  {% endif %}
 
 </body>
 <!-- Render the rest of the ChangeList view -->
-<!-- {{block.super}} -->
+
 {% endblock %}
