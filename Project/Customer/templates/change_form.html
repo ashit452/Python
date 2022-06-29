@@ -1,0 +1,757 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_modify admin_list %}
+
+{% block extrastyle %}
+{{ block.super }}
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<link rel="stylesheet" href="{% static 'admin/css/custom.css' %}">
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media }}
+
+
+{% endblock %}
+
+{% block content %}
+
+<body class="hold-transition sidebar-mini layout-fixed">
+  <div class="wrapper">
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <div class="container-fluid">
+          <div>
+            {% block messages %}
+            {% if messages %}
+            <ul class="messagelist">{% for message in messages %}
+              <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message|capfirst }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% endblock messages %}
+          </div>
+
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1> {{ opts.verbose_name_plural|capfirst }}</h1>
+            </div>
+            <div class="col-sm-6">
+              <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item"> {% if has_view_permission %}<a
+                    href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}</li>
+                <li class="breadcrumb-item"> {% if add %}{% blocktranslate with name=opts.verbose_name %}Add {{ name }}{% endblocktranslate %}{% else %}{{ original|truncatewords:"18" }}{% endif %}</li>
+              </ol>
+            </div>
+          </div>
+        </div><!-- /.container-fluid -->
+      </section>
+      <section class="content">
+        <div class="container-fluid">
+          <div class="row">
+
+            <div class="col-12">
+
+              <!-- /.card -->
+
+              <div class="card">
+
+
+                {% if customerDetails is None %}
+                <form method="post" enctype="multipart/form-data">
+                <div id="submitdiv"class="mt-2 mr-2 text-right">
+                  <input type="submit" class="btn btn-primary" value="Save">
+                </div>
+                <div class="card-body">
+                  <div class="tabs">
+                    <ul>
+                      <li><a href="#customer"><i class="fas fa-user"></i>&nbsp;Customer</a></li>
+                      <li><a href="#address"><i class="fas fa-map-marker"></i>&nbsp;Address</a></li>
+                    </ul>
+                    <div id="customer">
+
+                  
+                      
+                        <div class="form-row">
+                          <div class="form-group col-md-6">
+                            <label>First Name:</label>
+                            <input class="form-control" type="text" id="firstName" name="firstName" required>
+                          </div>
+                          <div class="form-group col-md-6">
+                            <label>Last Name:</label>
+                            <input class="form-control" type="text" id="lastName" name="lastName" required>
+                          </div>
+                        </div>
+                        <div class="custom-file">
+                          <label>Profile Image:</label>
+                        <input type="file"  id="profile" name="profile" accept="image/*" required>
+                        </div>
+                        
+                        <div class="callout callout-warning">
+                          <strong>Note</strong>
+                          <ul>
+                            <li>Maximum size : 8 MB</li>
+                            <li>Allowed file types : jpeg,jpg,png</li>
+                          </ul>
+                        </div>
+
+                        <div class="form-row">
+                          <div class="form-group col-md-6">
+                        <label>Email Id:</label>
+                        <input class="form-control" type="email" id="email" name="email" required>
+                      </div>
+                      <div class="form-group col-md-6">
+                        <label>Contact No.:</label>
+                        <input class="form-control" type="tel" id="mobile" name="mobile" maxlength="10" required>
+                        </div>
+                        </div>
+
+                        <div class="form-row">
+                          <div class="form-group col-md-6">
+                        <label>Password:</label>
+                        <input class="form-control" type="password" id="password" name="password" required>
+                      </div>
+                      <div class="form-group col-md-6">
+                        <label>Confirm Password:</label>
+                        <input class="form-control" type="password" id="confirmpassword" name="confirmpassword" required>
+                      </div>
+                      </div>
+                      <div class="form-row">
+                        <div class="form-group col-md-6">
+                        <label>Customer Group:</label>
+                        <select class="form-control" id="customerGroup" name="customerGroup" required>
+                          {% for i in customerGroup %}
+                          <option value="{{i.customerGroupId}}" {% if i.isDefault == True %} selected {% endif %}>
+                            {{i.customerGroupName}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <div class="form-group col-md-6">
+
+                        <div class="form-check form-check-inline m-4">
+                          <input class="form-check-input" type="checkbox" id="verified" name="verified">
+                          <label class="form-check-label" for="verified"><strong>Verify</strong></label>
+                        </div>
+                        </div>
+                        </div>
+
+                  </div>
+                  <div id="address">
+                    <form method="post" enctype="multipart/form-data">
+                      <div id="address-new">
+                      <div id="myform[0]">
+                        <hr>
+                        <div class="row"><h3 class="col-md-6 text-left">Address #1</h3><h3 class=" col-md-6 text-right" style="margin-top: 6px;"><i class="fa fa-trash delete-form"></i></h3></div>
+                        <hr>
+                        <div class="form-row">
+                        <div class="form-group col-md-6">
+                          <label>Name:</label>
+                          <input class="form-control" type="text" id="address[0][name]" name="address[0][name]" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                          <label>House No. / Building / Appartment:</label>
+                          <input class="form-control" type="text" id="address[0][building]" name="address[0][building]" required>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label>Area / Street / Sector / Village</label>
+                      <input type="text" class="form-control" id="address[0][street]" name="address[0][street]"  required>
+                      </div>
+                      
+                      
+                      <div class="form-row">
+                        <div class="form-group col-md-6">
+                      <label>Landmark</label>
+                      <input class="form-control" type="text" id="address[0][landmark]" name="address[0][landmark]" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label>Pin Code:</label>
+                      <input class="form-control" type="number" id="address[0][postalcode]" name="address[0][postalcode]" maxlength="6" required>
+                      </div>
+                      </div>
+
+                      <div class="form-row">
+                        <div class="form-group col-md-6">
+                          <label>State</label>
+                          <select class="form-control" id="address[0][state]" name="address[0][state]" required>
+                            <option value="">---------</option>
+                            {% for i in state %}
+                            <option value="{{i.stateId}}">{{ i.stateName }}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                          <label>City</label>
+                          <select class="form-control" id="address[0][city]" name="address[0][city]" required>
+                            
+                          </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+
+                        <div class="form-check form-check-inline m-4">
+                          <input class="form-check-input" type="checkbox" id="address[0][defaultaddr]" name="address[0][defaultaddr]">
+                          <label class="form-check-label" for="defaultaddr"><strong>Default</strong></label>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                    </div>
+                    
+                      <div class="add-div">
+                        <div class="add-button" id="add-new">
+                          <i class="fa fa-add"></i>
+                        add new Address
+                      </div>
+                      </div>
+                    
+
+                </div>
+                  </div>
+                </div>
+
+
+                    {% csrf_token %}
+                    
+
+                    
+                
+                </form>
+                </div>
+
+                {% else %}
+                {% for cust in customerDetails %}
+                <form method="post" enctype="multipart/form-data">
+                <div id="submitdiv"class="mt-2 mr-2 text-right">
+                  <input type="submit" class="btn btn-primary" value="Save">
+                </div>
+                <div class="card-body">
+                  
+                  <div class="tabs">
+                    <ul>
+                      <li><a href="#customer"><i class="fas fa-user"></i>&nbsp;Customer</a></li>
+                      <li><a href="#address"><i class="fas fa-map-marker"></i>&nbsp;Address</a></li>
+                    </ul>
+                    <div id="customer">
+                
+
+                
+                  
+                  <div class="form-row">
+                    <div class="form-group col-md-6">
+                      <label>First Name:</label>
+                      <input class="form-control" type="text" id="firstName" name="firstName" value="{{cust.firstName}}" required>
+                      <input class="form-control" type="hidden" id="cid" name="cid" value="{{cust.customerId}}">
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label>Last Name:</label>
+                      <input class="form-control" type="text" id="lastName" name="lastName" value="{{cust.lastName}}" required>
+                    </div>
+                  </div>
+                  <div class="custom-file">
+                    <label>Profile Image:</label>
+                  <input type="file"  id="profile" name="profile" accept="image/*" value="{{cust.profileImage}}" required>
+                  </div>
+                  
+                  <div class="callout callout-warning">
+                    <strong>Note</strong>
+                    <ul>
+                      <li>Maximum size : 8 MB</li>
+                      <li>Allowed file types : jpeg,jpg,png</li>
+                    </ul>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group col-md-6">
+                  <label>Email Id:</label>
+                  <input class="form-control" type="email" id="email" name="email" value="{{cust.email}}" required>
+                </div>
+                <div class="form-group col-md-6">
+                  <label>Contact No.:</label>
+                  <input class="form-control" type="tel" id="mobile" name="mobile" maxlength="10" value="{{cust.mobileNumber}}" required>
+                  </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group col-md-6">
+                  <label>Password:</label>
+                  <input class="form-control" type="password" id="password" name="password" value="{{cust.password}}" required>
+                </div>
+                <div class="form-group col-md-6">
+                  <label>Confirm Password:</label>
+                  <input class="form-control" type="password" id="confirmpassword" name="confirmpassword" value="{{cust.password}}" required>
+                </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                  <label>Customer Group:</label>
+                  <select class="form-control" id="customerGroup" name="customerGroup" required>
+                    {% for i in customerGroup %}
+                    <option value="{{i.customerGroupId}}" {% if i.customerGroupId == cust.customerGroup_id %} selected {% endif %}>
+                      {{ i.customerGroupName }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="form-group col-md-6">
+                  {% if not cust.emailVarificationDate %}
+                  <div class="form-check form-check-inline m-4">
+                    <input class="form-check-input" type="checkbox" id="verified" name="verified">
+                    <label class="form-check-label" for="verified"><strong>Verify</strong></label>
+                  </div>
+                  {% else %}
+                  <input type="hidden" value="{{cust.emailVarificationDate}}" id="verificationdate" name="verificationdate">
+                  {% endif %}
+                  </div>
+                  </div>
+                  {% endfor %}
+                </div>
+                <div id="address">
+                  
+                  
+                  
+              
+                  
+
+                  <form method="post" enctype="multipart/form-data">
+                    <div id="address-new">
+                      <hr>
+                        <div class="row"><h3 class="col-md-6 text-left">Address #1</h3><h3 class=" col-md-6 text-right" style="margin-top: 6px;"><i class="fa fa-trash delete-form"></i></h3></div>
+                        <hr>
+                    <div id="myform[0]">
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+                        <label>Name:</label>
+                        <input class="form-control" type="text" id="address[0][name]" name="address[0][name]" >
+                        <input class="form-control" type="hidden" id="address[0][addrid]" name="address[0][addrid]" >
+                      </div>
+                      <div class="form-group col-md-6">
+                        <label>House No. / Building / Appartment:</label>
+                        <input class="form-control" type="text" id="address[0][building]" name="address[0][building]" >
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label>Area / Street / Sector / Village:</label>
+                    <input type="text" class="form-control" id="address[0][street]" name="address[0][street]" >
+                    </div>
+                    
+                    
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+                    <label>Landmark</label>
+                    <input class="form-control" type="text" id="address[0][landmark]" name="address[0][landmark]" >
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label>Pin Code:</label>
+                    <input class="form-control" type="number" id="address[0][postalcode]" name="address[0][postalcode]" maxlength="6">
+                    </div>
+                    </div>
+
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+                        <label>State</label>
+                        <select class="form-control" id="address[0][state]" name="address[0][state]" >
+                          <option value="">---------</option>
+                          {% for i in state %}
+                          <option value="{{i.stateId}}" >{{ i.stateName }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <div class="form-group col-md-6">
+                        <label>City</label>
+                        <select class="form-control" id="address[0][city]" name="address[0][city]">
+                          <option value="">---------</option>
+                        </select>
+                      </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group col-md-6">
+                      
+                      <div class="form-check form-check-inline m-4">
+                        <input class="form-check-input" type="checkbox" id="address[0][defaultaddr]" name="address[0][defaultaddr]" >
+                        <label class="form-check-label" for="defaultaddr"><strong>Default</strong></label>
+                      </div>
+                      
+                      </div>
+                  </div>
+                </div>
+                    </div>
+                  
+                  <div class="add-div">
+                    <div class="add-button" id="add-new">
+                      <i class="fa fa-add"></i>
+                    add new Address
+                  </div>
+                  </div>
+                  
+                  {% csrf_token %}
+                  
+                  
+              
+              </form>
+              
+              <div>
+                <div class="m-4 text-center" style="background-color: cadetblue;"><h2><strong>Addresses</strong></h2></div>
+              </div>
+              <div class="form-row mt-3" id=addressview>
+                {% for addr in customerAddressDetails %}
+                <div class="form-group col-md-6">
+
+              {% if addr.isDefault == True %}
+              <div class="callout callout-warning">
+              {% else %}
+              <div class="callout callout-primary">
+              {% endif %}
+
+                <strong>{{addr.addressName}}</strong>
+                <ul id="addresses[{{forloop.counter0}}]">
+                  <li>House No. / Building / Appartment: {{addr.building}}</li>
+                  <li>Area / Street / Sector / Village: {{addr.street}}</li>
+                  <li>landMark: {{addr.landMark}}</li>
+                  <li>PinCode: {{addr.postalCode}}</li>
+                  {% for i in city %}
+                  {% if i.cityId == addr.city_id %}
+                  <li>City: {{i.cityName}}</li>
+                  {% endif %}
+                  {% endfor %}
+
+                  {% for i in state %}
+                  {% if i.stateId == addr.state_id %}
+                  <li>State: {{i.stateName}}</li>
+                  {% endif %}
+                  {% endfor %}
+                  <input type="hidden" id="{{addr.customerAddressId}}">
+                  <br>
+                  <a class="edit-address mr-4"><i class="fa fa-pen"></i> EDIT</a>
+                  <a class="delete-address ml-4" ><i class="fa fa-trash"></i> DELETE</a>
+
+                  
+                </ul>
+              </div>
+              </div>
+              {% endfor %}
+              </div>
+                </div>
+                </div>
+                
+                  
+
+              
+              
+              </div>
+              {% endif %}
+
+
+            </div>
+            
+            <!-- /.col -->
+          </div>
+          <!-- /.row -->
+        </div>
+        <!-- /.container-fluid -->
+    </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
+  <footer class="main-footer">
+    <div class="float-right d-none d-sm-block">
+      <b>Version</b> 3.2.0
+    </div>
+    <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved.
+  </footer>
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
+
+  </div>
+
+  <!-- jQuery -->
+  <script src="{% static 'admin/plugins/jquery/jquery.min.js' %}"></script>
+  <!-- Bootstrap 4 -->
+  <script src="{% static 'admin/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <!-- DataTable Plugins -->
+
+  <!-- AdminLTE App -->
+  <script src="{% static 'admin//dist/js/adminlte.min.js' %}"></script>
+  <!-- AdminLTE for demo purposes -->
+  <script src="{% static 'admin/dist/js/demo.js' %}"></script>
+  <!-- Page specific script -->
+  <script>
+    $(document).ready(function () {
+      var firstName = $('#firstName').text();
+      var lastName = $('#lastName').text();
+      var intials = firstName.charAt(0);
+      var profileImage = $('#profileImage').text(intials);
+    });
+  </script>
+
+
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+  <script>
+
+    $(function () {
+      $(".tabs").tabs();
+
+    var count=$('[id^=myform]').length-1;
+    console.log(count)
+    
+    
+    $("#add-new").click(function () {
+      console.log("clicked")
+      count++;
+      if (count<10){
+
+          var html = `<div id="myform[${count}]">
+            <hr>
+             <div class="row"><h3 class="col-md-6 text-left">Address #${count+1}</h3><h3 class=" col-md-6 text-right" style="margin-top: 6px;"><i class="fa fa-trash delete-form"></i></h3></div>
+            <hr>
+            <div class="form-row">
+      <div class="form-group col-md-6">
+                        <label>Name:</label>
+                        <input class="form-control" type="text" id="address[${count}][name]" name="address[${count}][name]">
+                        
+                      </div>
+                      <div class="form-group col-md-6">
+                        <label>House No. / Building / Appartment:</label>
+                        <input class="form-control" type="text" id="address[${count}][building]" name="address[${count}][building]">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label>Area / Street / Sector / Village:</label>
+                    <input type="text" class="form-control" id="address[${count}][street]" name="address[${count}][street]">
+                    </div>
+                    
+                    
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+                    <label>Landmark</label>
+                    <input class="form-control" type="text" id="address[${count}][landmark]" name="address[${count}][landmark]">
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label>Pin Code:</label>
+                    <input class="form-control" type="number" id="address[${count}][postalcode]" name="address[${count}][postalcode]" maxlength="6">
+                    </div>
+                    </div>
+
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+                        <label>State</label>
+                        <select class="form-control" id="address[${count}][state]" name="address[${count}][state]" >
+                          <option value="">---------</option>
+                          {% for i in state %}
+                          <option value="{{i.stateId}}" >{{ i.stateName }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <div class="form-group col-md-6">
+                        <label>City</label>
+                        <select class="form-control" id="address[${count}][city]" name="address[${count}][city]" >
+                          <option value="">---------</option>
+                        </select>
+                      </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group col-md-6">
+                      
+                      <div class="form-check form-check-inline m-4">
+                        <input class="form-check-input" type="checkbox" id="address[${count}][defaultaddr]" name="address[${count}][defaultaddr]" >
+                        <label class="form-check-label" for="defaultaddr"><strong>Default</strong></label>
+                      </div>
+                      
+                      </div>
+                  </div>`;
+          
+          $("#address-new").append(html);
+          
+      
+      $(".delete-form").click(function(){
+      count--;
+      $(event.target).closest("div").parent().remove();
+            
+    });
+    
+    $("#address\\[" + count + "\\]\\[state\\]").change(function () {
+    console.log("hello hello")
+    const statename = $(this).val();
+    console.log(statename) 
+    $.ajax({                                // initialize an AJAX request
+        type: "POST",
+        url: "/customer/getcitiesajax/",
+        data: {
+            'statename': statename,      
+            'csrfmiddlewaretoken':$('input[name=csrfmiddlewaretoken]').val(),
+        },
+        
+        success: function (data) {          // `data` is from `getcitiesajax` view function
+            let html_data = '<option value="">---------</option>';
+            data.forEach(function (data) {
+                html_data += `<option value="${data.cityId}">${data.cityName}</option>`
+            });
+            $("#address\\[" + count + "\\]\\[city\\]").html(html_data);   // replace the contents of the topic input with the data that came from the server
+        }
+    });
+
+    });
+}
+    });
+    
+    });
+
+  </script>
+
+
+
+<script>
+  
+  $('.delete-address').click(function (e) {
+    e.preventDefault();
+    
+    
+    
+    var address_id = $(this).parent("ul").children("input").attr("id");
+    console.log(address_id);
+    
+    if (confirm('Are you sure to delete this record ?')) {
+      $.ajax({
+        url: "/customer/delete?id=" + address_id + "/",
+        type: 'GET',
+        success: function (response) {
+          $("#" + address_id).parent("ul").parent("div").remove();
+          $("#address").load(location.href + " #address");
+          alert("Record delete successfully.");
+          
+        },
+        error: function () {
+          alert('Something is wrong, couldn\'t delete record');
+        },
+
+        cache: false,
+        contentType: false,
+        processData: false,
+
+      });
+    }
+
+  });
+
+  
+  $('.edit-address').click(function (e) {
+    e.preventDefault();
+    
+    var address_id = $(this).parent("ul").children("input").attr("id");
+    console.log(address_id);
+    
+    
+    $.ajax({
+        url: "/customer/edit?id=" + address_id + "/",
+        type: 'GET',
+        success: function (response) {
+          console.log(response[0]);
+          console.log(response[0].addressName);
+          console.log(response[0].building);
+          console.log(response[0].street);
+          console.log(response[0].landMark);
+          console.log(response[0].postalCode);
+          console.log(response[0].city_id);
+          console.log(response[0].state_id);
+          console.log(response[0].isDefault);
+
+          $("#address\\[" + 0 + "\\]\\[addrid\\]").val(response[0].customerAddressId);
+          $("#address\\[" + 0 + "\\]\\[name\\]").val(response[0].addressName);
+          $("#address\\[" + 0 + "\\]\\[building\\]").val(response[0].building);
+          $("#address\\[" + 0 + "\\]\\[street\\]").val(response[0].street);
+          $("#address\\[" + 0 + "\\]\\[landmark\\]").val(response[0].landMark);
+          $("#address\\[" + 0 + "\\]\\[postalcode\\]").val(response[0].postalCode);
+         
+          
+          $("#address\\[" + 0 + "\\]\\[state\\] option").filter(function() { 
+            return ($(this).val() == response[0].state_id); //To select state
+          }).prop('selected', true);
+          
+          const statename = response[0].state_id;
+          console.log(statename) 
+          $.ajax({                                // initialize an AJAX request
+              type: "POST",
+              url: "/customer/getcitiesajax/",
+              data: {
+                  'statename': statename,      
+                  'csrfmiddlewaretoken':$('input[name=csrfmiddlewaretoken]').val(),
+              },
+              
+              success: function (data) {          // `data` is from `getcitiesajax` view function
+                  let html_data = '<option value="">---------</option>';
+                  data.forEach(function (data) {
+                      if(data.cityId == response[0].city_id){
+                      html_data += `<option value="${data.cityId}" selected>${data.cityName}</option>`
+                      }
+                      else{
+                        html_data += `<option value="${data.cityId}" selected>${data.cityName}</option>`
+                      }
+                  });
+
+                    $("#address\\[" + 0 + "\\]\\[city\\]").html(html_data);   // replace the contents of the topic input with the data that came from the server
+                }
+            });
+
+          
+          if(response[0].isDefault == true){
+            $("#address\\[" + 0 + "\\]\\[defaultaddr\\]").prop('checked', true);
+          }
+          else{
+            $("#address\\[" + 0 + "\\]\\[defaultaddr\\]").prop('checked', false);
+          }
+
+         
+
+        },
+        error: function () {
+          alert('Something is wrong, couldn\'t delete record');
+        },
+
+        cache: false,
+        contentType: false,
+        processData: false,
+
+      });
+    
+  });
+
+
+   $("#address\\[" + 0 + "\\]\\[state\\]").change(function () {
+
+      const statename = $(this).val();
+      console.log(statename) 
+      $.ajax({                                // initialize an AJAX request
+          type: "POST",
+          url: "/customer/getcitiesajax/",
+          data: {
+              'statename': statename,      
+              'csrfmiddlewaretoken':$('input[name=csrfmiddlewaretoken]').val(),
+          },
+          
+          success: function (data) {          // `data` is from `getcitiesajax` view function
+              let html_data = '<option value="">---------</option>';
+              data.forEach(function (data) {
+                  html_data += `<option value="${data.cityId}">${data.cityName}</option>`
+              });
+              $("#address\\[" + 0 + "\\]\\[city\\]").html(html_data);   // replace the contents of the topic input with the data that came from the server
+          }
+      });
+    });
+</script>
+
+
+</body>
+<!-- Render the rest of the ChangeList view -->
+
+{% endblock %}

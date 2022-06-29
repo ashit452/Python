@@ -1,0 +1,12 @@
+.add-div{
+    background-color: #3f474e;
+}
+.add-div .add-button{
+    margin-left: 10%;
+    color: white;
+}
+
+.add-button:hover{
+    cursor: pointer;
+    color: aqua;
+}
