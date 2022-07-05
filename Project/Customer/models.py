@@ -36,6 +36,8 @@ class customer(models.Model):
     emailVarificationDate = models.DateTimeField(default=None,null=True,blank=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
+    code = models.CharField(max_length=8,default="00000000")
+    emailSentOn = models.DateTimeField(null=True,blank=True,default=None)
 
     def __str__(self):
         return self.firstName
@@ -76,8 +78,8 @@ class customerAddress(models.Model):
             return super(customerAddress, self).save(*args, **kwargs)
         with transaction.atomic():
             customerAddress.objects.filter(
-                isDefault=True).update(isDefault=False)
+                isDefault=True).filter(customer=self.customer).update(isDefault=False)
             return super(customerAddress, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.addressName
+        return self.addressName +str(self.customer)

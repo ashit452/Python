@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+
+     <!-- bootstrap css -->
+    <link  href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+    <!-- owl stylesheets --> 
+    
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+      .container{
+        border-style: outset;
+        text-align: center;
+      }
+    </style>
+    
+    <title>Email Verification</title>
+</head>
+<body>
+    
+    
+          <form id="emailVerificationForm" action="" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+              <div>Email Verification</div>
+              <div class="form-group col-md-6">
+
+                <div class="form-check  m-4">
+                  <input class="form-check-input" type="radio" id="verifiedyes" name="verified" value="yes">
+                  <label class="form-check-label" for="verifiedyes"><strong>Yes This is me</strong></label>
+                </div>
+                </div>
+                <div class="form-group col-md-6">
+
+                  <div class="form-check  m-4">
+                    <input class="form-check-input" type="radio" id="verifiedno" name="verified" value="no">
+                    <label class="form-check-label" for="verifiedno"><strong>No, This is not me</strong></label>
+                  </div>
+                  </div>
+                
+                <input type="submit" class="btn btn-primary" value="submit">
+          
+            </div>
+            
+            
+                    
+            
+    
+            
+          </form>
+      
+    
+</body>
+    
+</html>

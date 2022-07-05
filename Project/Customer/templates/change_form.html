@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
 <link rel="stylesheet" href="/resources/demos/style.css">
 <link rel="stylesheet" href="{% static 'admin/css/custom.css' %}">
+
 {% endblock %}
 
 {% block extrahead %}
@@ -62,7 +63,7 @@
 
 
                 {% if customerDetails is None %}
-                <form method="post" enctype="multipart/form-data">
+                <form method="post" id="addcustomerform" enctype="multipart/form-data">
                 <div id="submitdiv"class="mt-2 mr-2 text-right">
                   <input type="submit" class="btn btn-primary" value="Save">
                 </div>
@@ -88,9 +89,11 @@
                         </div>
                         <div class="custom-file">
                           <label>Profile Image:</label>
-                        <input type="file"  id="profile" name="profile" accept="image/*" required>
+                          <input type="file"  id="profile" name="profile" onchange="readURL(this);" accept="image/*" required>
+                          <a id="imglink" href="#"><img id="img" src ="#" style="height:50px; width:50px;"></a>
+                  
                         </div>
-                        
+                        <br><br>
                         <div class="callout callout-warning">
                           <strong>Note</strong>
                           <ul>
@@ -106,7 +109,7 @@
                       </div>
                       <div class="form-group col-md-6">
                         <label>Contact No.:</label>
-                        <input class="form-control" type="tel" id="mobile" name="mobile" maxlength="10" required>
+                        <input class="form-control" type="number" id="mobile" name="mobile" maxlength="10" required>
                         </div>
                         </div>
 
@@ -141,7 +144,7 @@
 
                   </div>
                   <div id="address">
-                    <form method="post" enctype="multipart/form-data">
+                    <!-- <form method="post" id="addcustomeraddress" enctype="multipart/form-data"> -->
                       <div id="address-new">
                       <div id="myform[0]">
                         <hr>
@@ -226,7 +229,7 @@
 
                 {% else %}
                 {% for cust in customerDetails %}
-                <form method="post" enctype="multipart/form-data">
+                <form method="post" id="updatecustomerform" enctype="multipart/form-data">
                 <div id="submitdiv"class="mt-2 mr-2 text-right">
                   <input type="submit" class="btn btn-primary" value="Save">
                 </div>
@@ -255,9 +258,11 @@
                   </div>
                   <div class="custom-file">
                     <label>Profile Image:</label>
-                  <input type="file"  id="profile" name="profile" accept="image/*" value="{{cust.profileImage}}" required>
+                    <!-- <img src ="/media/{{cust.profileImage}}" style="height:50px; width:50px;"> -->
+                  <input type="file"  id="profile" name="profile" onchange="readURL(this);" accept="image/*">
+                  <a id="imglink" href="/media/{{cust.profileImage}}" target="_blank"><img id="img" src ="/media/{{cust.profileImage}}" style="height:50px; width:50px;"></a>
                   </div>
-                  
+                  <br><br>
                   <div class="callout callout-warning">
                     <strong>Note</strong>
                     <ul>
@@ -273,18 +278,18 @@
                 </div>
                 <div class="form-group col-md-6">
                   <label>Contact No.:</label>
-                  <input class="form-control" type="tel" id="mobile" name="mobile" maxlength="10" value="{{cust.mobileNumber}}" required>
+                  <input class="form-control" type="number" id="mobile" name="mobile"  value="{{cust.mobileNumber}}" required>
                   </div>
                   </div>
 
                   <div class="form-row">
                     <div class="form-group col-md-6">
                   <label>Password:</label>
-                  <input class="form-control" type="password" id="password" name="password" value="{{cust.password}}" required>
+                  <input class="form-control" type="password" id="password" name="password" >
                 </div>
                 <div class="form-group col-md-6">
                   <label>Confirm Password:</label>
-                  <input class="form-control" type="password" id="confirmpassword" name="confirmpassword" value="{{cust.password}}" required>
+                  <input class="form-control" type="password" id="confirmpassword" name="confirmpassword" >
                 </div>
                 </div>
                 <div class="form-row">
@@ -297,9 +302,9 @@
                     {% endfor %}
                   </select>
                 </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-6" id="checkboxes">
                   {% if not cust.emailVarificationDate %}
-                  <div class="form-check form-check-inline m-4">
+                  <div class="form-check form-check-inline m-4" id="verifycheckbox">
                     <input class="form-check-input" type="checkbox" id="verified" name="verified">
                     <label class="form-check-label" for="verified"><strong>Verify</strong></label>
                   </div>
@@ -310,14 +315,11 @@
                   </div>
                   {% endfor %}
                 </div>
+
+
                 <div id="address">
                   
-                  
-                  
-              
-                  
-
-                  <form method="post" enctype="multipart/form-data">
+                  <!-- <form method="post" enctype="multipart/form-data"> -->
                     <div id="address-new">
                       <hr>
                         <div class="row"><h3 class="col-md-6 text-left">Address #1</h3><h3 class=" col-md-6 text-right" style="margin-top: 6px;"><i class="fa fa-trash delete-form"></i></h3></div>
@@ -347,7 +349,7 @@
                   </div>
                   <div class="form-group col-md-6">
                     <label>Pin Code:</label>
-                    <input class="form-control" type="number" id="address[0][postalcode]" name="address[0][postalcode]" maxlength="6">
+                    <input class="form-control" type="number" id="address[0][postalcode]" name="address[0][postalcode]">
                     </div>
                     </div>
 
@@ -492,11 +494,53 @@
       var intials = firstName.charAt(0);
       var profileImage = $('#profileImage').text(intials);
     });
-  </script>
 
+    var oldemail = `{{ customerDetails.0.email }}`;
+    var verification = `{{ customerDetails.0.emailVarificationDate }}`;
+    console.log("old",oldemail,verification);
+    $("#email").change(function(){
+      $("#verifycheckbox").remove();
+      if (oldemail != $("#email").val()){
+        
+        var verify = `<div class="form-check form-check-inline m-4" id="verifycheckbox">
+                        <input class="form-check-input" type="checkbox" id="verified" name="verified">
+                        <label class="form-check-label" for="verified"><strong>Verify</strong></label>
+                      </div>
+                      `;
+        $("#customer #checkboxes").append(verify);
+        }
+        else if(oldemail == $("#email").val() && verification == "None"){
+          var verify = `<div class="form-check form-check-inline m-4" id="verifycheckbox">
+                          <input class="form-check-input" type="checkbox" id="verified" name="verified">
+                          <label class="form-check-label" for="verified"><strong>Verify</strong></label>
+                        </div>`;
+          $("#customer #checkboxes").append(verify);
+        }
+    });
+    function readURL(input) {
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+      $('#img').attr('src', e.target.result).width(50).height(50);
+      $('#imglink').prop('href', e.target.result).prop('target','_blank');
+    };
+
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+  </script>
+  
 
   <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
   <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+
+  <!-- JQuery & JQuery validations -->
+<!-- <script src="//code.jquery.com/jquery-3.3.1.min.js"></script> -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.js"></script> 
+<script src="{% static 'js/jquery-validation-ud.js' %}"></script>
+
+
   <script>
 
     $(function () {
@@ -539,7 +583,7 @@
                   </div>
                   <div class="form-group col-md-6">
                     <label>Pin Code:</label>
-                    <input class="form-control" type="number" id="address[${count}][postalcode]" name="address[${count}][postalcode]" maxlength="6">
+                    <input class="form-control" type="number" id="address[${count}][postalcode]" name="address[${count}][postalcode]" >
                     </div>
                     </div>
 
@@ -605,7 +649,9 @@
 }
     });
     
+    
     });
+    
 
   </script>
 
@@ -752,6 +798,5 @@
 
 
 </body>
-<!-- Render the rest of the ChangeList view -->
 
 {% endblock %}

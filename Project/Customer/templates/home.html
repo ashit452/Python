@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    
+    <title>Home Page</title>
+    <style>
+        .error{
+            color: red;
+        }
+        .toast{
+            background-color:black;
+            color: white;
+            border-radius: 13px;
+            
+        }
+    </style>
+    
+</head>
+<body>
+    hello, from home page
+</body>
+{%if messages %}
+{% for message in messages %}
+
+            <script>
+                toastr.options={"positionClass": "toast-top-center","showMethod": "fadeIn", "hideMethod": "fadeOut","closeButton": true} 
+                alert(' {{ message }}');
+            </script>   
+            {% endfor %}
+        {% endif %}
+</html>
