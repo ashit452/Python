@@ -11,12 +11,15 @@ def home(request):
 
 def page_list():
     pages = page.objects.filter(status="enabled").order_by('sortOrder')
+    for i in pages:
+        print(i.slug)
     languages = language.objects.filter(status="enabled")
     
     return pages,languages
 
 def page_details(request,slug):
-    pages,languages = page_list()
+    
+    languages = language.objects.filter(status="enabled")
 
     if request.method == 'POST':
         locale=request.POST.get('lang')
@@ -27,11 +30,13 @@ def page_details(request,slug):
         return JsonResponse(msg)
 
     if "defaultLanguage" in request.session:
-        pageDetails = pageTranslation.objects.raw("select * from page_pagetranslation as c inner join language_language as l on c.language_id=l.locale where c.page_id='"+slug+"' and l.locale= '"+request.session['defaultLanguage']+"'")
+        pagelist = pageTranslation.objects.raw("select * from page_pagetranslation as c inner join language_language as l on c.language_id=l.locale inner join page_page as p on c.page_id=p.pageId where l.locale= '"+request.session['defaultLanguage']+"'")
+        pageDetails = pageTranslation.objects.raw("select * from page_pagetranslation as c inner join language_language as l on c.language_id=l.locale inner join page_page as p on c.page_id=p.pageId where p.slug='"+slug+"' and l.locale= '"+request.session['defaultLanguage']+"'")
         pageData = pageTranslation.objects.raw("select * from page_pagetranslation as c inner join language_language as l on c.language_id=l.locale where l.locale= '"+request.session['defaultLanguage']+"'")
         
     else:
-        pageDetails = pageTranslation.objects.raw("select * from page_pagetranslation as c inner join language_language as l on c.language_id=l.locale where c.page_id='"+slug+"' and l.isDefault= 1")
+        pagelist = pageTranslation.objects.raw("select * from page_pagetranslation as c inner join language_language as l on c.language_id=l.locale inner join page_page as p on c.page_id=p.pageId where l.locale= '"+request.session['defaultLanguage']+"'")
+        pageDetails = pageTranslation.objects.raw("select * from page_pagetranslation as c inner join language_language as l on c.language_id=l.locale inner join page_page as p on c.page_id=p.pageId where p.slug='"+slug+"' and l.isDefault= 1")
         pageData = pageTranslation.objects.raw("select * from page_pagetranslation as c inner join language_language as l on c.language_id=l.locale where l.isDefault= 1")
         
     for i in pageDetails:
@@ -42,4 +47,4 @@ def page_details(request,slug):
        
 
     print(request.session['defaultLanguage'])
-    return render(request,'slugpage.html',{'page':pageDetails,'pageData':pageData,'pages':pages,'languages':languages,'languageSession':request.session['defaultLanguage']})
+    return render(request,'slugpage.html',{'page':pageDetails,'pageData':pageData,'pages':pagelist,'languages':languages,'languageSession':request.session['defaultLanguage']})

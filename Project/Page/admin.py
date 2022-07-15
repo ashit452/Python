@@ -40,10 +40,9 @@ class PageAdmin(admin.ModelAdmin):
                 
                     lang = language.objects.get(locale = langcode)
                     
-
-                    
-
-                    pg = page.objects.get(slug=slug)
+ 
+                    latestPage = page.objects.latest("pageId")
+                    pg = page.objects.get(pageId=latestPage.pageId)
                     
                     translation = pageTranslation(page=pg,title=title,content=content,language=lang)
                     translation.save()
@@ -57,7 +56,7 @@ class PageAdmin(admin.ModelAdmin):
                     print(context['pages'])
         
         else:
-            pageDetails = page.objects.filter(slug=obj)
+            pageDetails = page.objects.filter(pageId=obj)
             context['pageDetails'] = pageDetails
             # pageTranslationDetails = pageTranslation.objects.filter(page=obj)
             # context['pageTranslationDetails'] = pageTranslationDetails
@@ -77,8 +76,10 @@ class PageAdmin(admin.ModelAdmin):
                 slug = request.POST['slug']
                 status = request.POST['status']
                 sortOrder = request.POST['order']
+                pageid = request.POST['pageid']
 
-                pageObj = page.objects.filter(slug=slug).update(status=status,sortOrder=sortOrder)
+                pgid = page.objects.get(pageId=pageid)
+                pageObj = page.objects.filter(pageId=pageid).update(slug=slug,status=status,sortOrder=sortOrder)
                 
 
                 for i in languageData:
@@ -93,9 +94,9 @@ class PageAdmin(admin.ModelAdmin):
 
                     
 
-                    pg = page.objects.get(slug=slug)
+                    # pgid = page.objects.get(page=slug)
                     
-                    translation = pageTranslation.objects.filter(contentId=contentId).update(page=pg,title=title,content=content,language=lang)
+                    translation = pageTranslation.objects.filter(contentId=contentId).update(page=pgid,title=title,content=content,language=lang)
                     
             
                 messages.success(request,slug+" updated successfully")

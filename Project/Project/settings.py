@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'Attribute',
     'Theme',
     'Customer',
+    'Block',
+    'Banner',
 ]
 
 MIDDLEWARE = [

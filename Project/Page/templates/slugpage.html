@@ -82,7 +82,7 @@
         var selected_language_code = default_language;
 
 
-        {% for i in page %}
+        `{% for i in page %}`
             
             
             if ('{{i.locale}}' == selected_language_code){
@@ -92,32 +92,11 @@
                 $('#main div').html('{{i.content|safe}}');
             }
 
-        {% endfor %}
+        `{% endfor %}`
         
-        var pageTitles = [];
+        // var pageTitles = [];
 
-        {% for i in pageData %}
-            
-            
-            if ('{{i.locale}}' == selected_language_code){
-                pageTitles.push("{{i.title}}");
-                console.log("page title :"+ pageTitles);
-                // for (j = 0; j < {{pageData|length}}; j++){
-                    
-                    $('#footerLink h6 a').html('{{i.title}}');
-                
-                // }
-            }
-            $('#headerLink nav').each(function(){
-                for(i=0;i<pageTitles.length;i++){
-                        if($('a').is(':empty')){
-                            $('a').html(pageTitles[i]);
-                            
-                        }
-                    }
-                    });
-
-        {% endfor %}
+        
         
 });
 

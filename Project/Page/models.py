@@ -5,7 +5,8 @@ from Language.models import language
 
 # Create your models here.
 class page(models.Model):
-    slug = models.SlugField(primary_key=True, unique=True)
+    pageId = models.AutoField(primary_key=True)
+    slug = models.SlugField(unique=True)
     statusChoice = (
         ('enabled','Enabled'),
         ('disabled','Disabled'),

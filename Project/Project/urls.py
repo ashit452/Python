@@ -24,7 +24,8 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('admin/login/', auth_views.LoginView.as_view(template_name='admin/login.html'), name='login'), #new
     path('admin/', admin.site.urls),
-    # path('',include('Page.urls')),
+    path('page/',include('Page.urls')),
+    path('block/',include('Block.urls')),
     path('customer/',include('Customer.urls')),
 ]
 handler404 = "Project.views.page_not_found_view"

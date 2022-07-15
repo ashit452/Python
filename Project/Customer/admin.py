@@ -1,6 +1,8 @@
 from datetime import datetime
 from django.contrib import admin,messages
 from django.http import HttpResponse, HttpResponseRedirect
+
+from .apps import CustomerConfig
 from .models import customer, customerGroup, customerAddress, city, state
 from django.utils.html import format_html
 from django.db import  IntegrityError
@@ -16,6 +18,7 @@ from django.contrib import messages
 from django.conf import settings
 from hashlib import md5
 import re
+from django.shortcuts import render
 
 
 # Register your models here.
@@ -32,8 +35,8 @@ def validate_file_size(value):
             return True
 
 # password validation
-def validatePassword(p):
-        password = p
+def validate_password(value):
+        password = value
         pattern_password = "(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
         if len(password) < 8:
             return False
@@ -42,11 +45,21 @@ def validatePassword(p):
         else:
             return True
 
+# postalcode validation
+def validate_postalcode(value):
+    # err = ""
+    if value == "":
+        return False
+    elif len(value) != 6:
+        return False
+    else:
+        return True
+
 
 class CustomerAdmin(admin.ModelAdmin):
     change_form_template = 'change_form.html'
     
-    list_display = ['name','email','profile','customerGroup','verified','createdAt','updatedAt',]
+    list_display = ['name','email','profile','customerGroup','verified','created','updated',]
 
     def profile(self,obj):
         return format_html(f'<img src ="/media/{obj.profileImage}" style="height:30; width:30px;">')
@@ -59,6 +72,12 @@ class CustomerAdmin(admin.ModelAdmin):
             return "No"
         else:
             return "Yes"
+
+    def created(self,obj):
+        return obj.createdAt.strftime(CustomerConfig.date_format)
+
+    def updated(self,obj):
+        return obj.updatedAt.strftime(CustomerConfig.date_format)
 
     
             
@@ -75,7 +94,7 @@ class CustomerAdmin(admin.ModelAdmin):
         context["state"]=st
         ct = city.objects.all()
         context["city"]=ct
-
+        print(CustomerConfig.date_format)
          
         # add customer and address
         if obj is None:
@@ -94,7 +113,7 @@ class CustomerAdmin(admin.ModelAdmin):
                 custGrp = post_dict['customerGroup']
                 verified = post_dict.get('verified',None)
 
-                if validatePassword(password):
+                if validate_password(password):
                     if password == confirmPassword:
                         password = md5(password.encode()).hexdigest()
                         
@@ -172,10 +191,15 @@ class CustomerAdmin(admin.ModelAdmin):
                         latestCustomer = customer.objects.latest("customerId")
                         
                         customerobj = customer.objects.get(customerId=latestCustomer.customerId)
-                        
+
+                        # if validate_postalcode(postalcode):
+                        #     addr = customerAddress(addressName = name, building = building, street = street, postalCode =postalcode, city = cityValue,state = stateValue, landMark =landmark, customer = customerobj,isDefault = default)
+                        #     addr.save()
+                        # else:
+                        #     context['postal_err'] = "Please enter 6 digits for postalcode"
+                        #     return super(CustomerAdmin,self).changeform_view(request, obj ,form_url,context)
                         addr = customerAddress(addressName = name, building = building, street = street, postalCode =postalcode, city = cityValue,state = stateValue, landMark =landmark, customer = customerobj,isDefault = default)
                         addr.save()
-                        
                         
                     
 
@@ -194,7 +218,7 @@ class CustomerAdmin(admin.ModelAdmin):
            # update customer and address 
             if request.method == 'POST':
                 post_dict = parser.parse(request.POST.urlencode())
-        
+                print(post_dict,request.FILES)
                 cid = post_dict['cid']
                 fname= post_dict['firstName']
                 lname = post_dict['lastName']
@@ -241,7 +265,7 @@ class CustomerAdmin(admin.ModelAdmin):
 
                     if password == '':
                         custupdt = customer.objects.filter(customerId=cid).update(firstName = fname, lastName = lname, mobileNumber = mobile, email = email,customerGroup = custgrpValue,emailVarificationDate = verifiedDate)
-                    elif validatePassword(password):
+                    elif validate_password(password):
                         if password == confirmPassword:
                             password = md5(password.encode()).hexdigest()
                             
